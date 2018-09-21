@@ -73,7 +73,9 @@ async function getConfig() {
     return config;
   } catch (error) {
     console.log('Failed to get configuration'.error);
-    console.error(error);
+    console.log('Suggestions:'.info);
+    console.log(`Run ${'firebase init'.code} to start a project directory in the current folder.`.verbose);
+    console.log(`Run ${'firebase use --add'.code} to set active project.`.verbose);
     process.exit(1);
   }
 } // Commands that need Functions config
@@ -114,7 +116,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         } catch (error) {
           console.log(`Failed to set Functions configuration`.error);
           console.log(`Try re-run with the following command`.help);
-          console.log(`firebase functions:config:set views.${options.name}=${res.data.liffId}`.prompt);
+          console.log(`firebase functions:config:set views.${options.name}=${res.data.liffId}`.code);
           console.error(error);
           process.exit(1);
         }
@@ -168,7 +170,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         } catch (error) {
           console.log(`Failed to unset view(s) in Functions configuration`.error);
           console.log(`Try looking for view name with LIFF ID ${options.id.input} using ${'fliff get'.prompt} command and unset it manually`.help);
-          console.log(`firebase functions:config:unset views.<viewName>`.prompt);
+          console.log(`firebase functions:config:unset views.<viewName>`.code);
           console.error(error);
           process.exit(1);
         }
