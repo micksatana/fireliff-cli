@@ -64,3 +64,4 @@ typings/
 .firebaserc
 firebase.json
 functions
+public
