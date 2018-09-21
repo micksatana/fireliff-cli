@@ -1,0 +1,69 @@
+{
+  "name": "@intocode-io/fireliff-cli",
+  "version": "1.0.0",
+  "description": "Command line interface for building LIFF app on Firebase",
+  "main": "lib/index.js",
+  "bin": {
+    "fliff": "bin/cli.js"
+  },
+  "scripts": {
+    "clean": "rimraf bin",
+    "coverage": "jest --coverage",
+    "build": "babel lib/cli.js --out-dir bin --source-maps --quiet",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/intocode-io/fireliff-cli.git"
+  },
+  "keywords": [
+    "LIFF",
+    "Firebase",
+    "Command",
+    "Line",
+    "Interface",
+    "CLI"
+  ],
+  "author": "Satana Charuwichitratana",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/intocode-io/fireliff-cli/issues"
+  },
+  "homepage": "https://github.com/intocode-io/fireliff-cli#readme",
+  "dependencies": {
+    "ajv": "^6.5.3",
+    "axios": "^0.18.0",
+    "colors": "^1.3.2",
+    "commander": "^2.18.0",
+    "console.table": "^0.10.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "eslint": "^5.6.0",
+    "eslint-plugin-jest": "^21.22.1",
+    "husky": "^0.14.3",
+    "jest": "^23.6.0"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "lib/**/*.{js,jsx}",
+      "!**/node_modules/**"
+    ],
+    "coverageDirectory": "coverage",
+    "roots": [
+      "test"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint && npm test",
+      "pre-push": "npm run lint && npm test"
+    }
+  }
+}

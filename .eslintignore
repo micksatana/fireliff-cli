@@ -1,0 +1,7 @@
+bin
+coverage
+doc
+man
+node_modules
+babel.config.js
+functions
