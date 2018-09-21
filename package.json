@@ -9,7 +9,7 @@
   "scripts": {
     "clean": "rimraf bin",
     "coverage": "jest --coverage",
-    "build": "babel lib/cli.js --out-dir bin --source-maps --quiet",
+    "build": "npm run clean && babel lib --out-dir bin --source-maps --quiet && chmod +x bin/cli.js",
     "lint": "eslint .",
     "test": "jest"
   },
