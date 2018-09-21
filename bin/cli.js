@@ -26,19 +26,42 @@ colors.setTheme({
   error: 'red'
 });
 
-const Commander = require('commander');
+const commandLineArgs = require('command-line-args');
 
-Commander.version(_package.default.version, '-v, --version').command('fliff <operation>').option('--id <id>', 'LIFF view id in Firebase Functions configuration').option('--name <name>', 'LIFF view name in Firebase Functions configuration').option('--type <type>', 'LIFF view type could be compact|tall|full').option('--url <url>', 'LIFF view URL').action(async (operation, cmd) => {
-  let accessToken;
-  let config;
-  let viewNames;
-  let data;
-  let req;
-  let res;
+const {
+  operation,
+  _unknown
+} = commandLineArgs([{
+  name: 'operation',
+  defaultOption: true
+}], {
+  stopAtFirstUnknown: true
+});
+const argv = _unknown || [];
+const options = commandLineArgs([{
+  name: 'id',
+  type: String
+}, {
+  name: 'name',
+  type: String
+}, {
+  name: 'type',
+  type: String
+}, {
+  name: 'url',
+  type: String
+}, {
+  name: 'version',
+  alias: 'v',
+  type: Boolean
+}], {
+  argv
+});
 
+async function getConfig() {
   try {
     console.log('Get Firebase Functions configuration'.verbose);
-    config = await _index.FunctionsConfig.get();
+    let config = await _index.FunctionsConfig.get();
 
     if (!config.line || !config.line.access_token) {
       console.log('Functions configuration not found: line.access_token'.help);
@@ -47,197 +70,219 @@ Commander.version(_package.default.version, '-v, --version').command('fliff <ope
       process.exit(1);
     }
 
-    accessToken = config.line.access_token;
+    return config;
   } catch (error) {
     console.log('Failed to get configuration'.error);
     console.error(error);
     process.exit(1);
   }
+} // Commands that need Functions config
 
+
+if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
+  getConfig().then(async config => {
+    let accessToken = config.line.access_token;
+    let viewNames;
+    let data;
+    let req;
+    let res;
+
+    switch (operation) {
+      case 'add':
+        req = new _index.LIFFAddRequest({
+          accessToken
+        });
+        data = {
+          view: {
+            type: options.type,
+            url: options.url
+          }
+        };
+
+        try {
+          console.log('Sending request to add LIFF view...'.verbose);
+          res = await req.send(data);
+        } catch (error) {
+          console.log(`Failed to add LIFF view`.error);
+          console.error(error);
+          process.exit(1);
+        }
+
+        try {
+          console.log(`Created ${options.name.input} view with LIFF ID: ${res.data.liffId.info}`.verbose);
+          await _index.LIFFConfig.setView(options.name, res.data.liffId);
+        } catch (error) {
+          console.log(`Failed to set Functions configuration`.error);
+          console.log(`Try re-run with the following command`.help);
+          console.log(`firebase functions:config:set views.${options.name}=${res.data.liffId}`.prompt);
+          console.error(error);
+          process.exit(1);
+        }
+
+        break;
+
+      case 'delete':
+        req = new _index.LIFFDeleteRequest({
+          accessToken
+        });
+
+        if (!options.id && !options.name) {
+          console.warn(`Command ${'fliff delete'.prompt} required LIFF ID or name option`.warn);
+          console.log(`Try re-run ${'fliff delete --id <liffId>'.input} OR  ${'fliff delete --name <viewName>'.input}`.help);
+          process.exit(1);
+        }
+
+        if (options.name) {
+          options.id = _index.LIFFConfig.getViewIdByName(options.name, config);
+
+          if (typeof options.id !== 'string') {
+            console.error(`Failed to retrieve LIFF ID with view name ${options.name.input}`.error);
+            process.exit(1);
+          }
+        }
+
+        try {
+          console.log(`Sending request to delete LIFF view ${options.id.input}`.verbose);
+          res = await req.send(options.id);
+          console.log(`Deleted view with LIFF ID: ${options.id.input}`.verbose);
+        } catch (error) {
+          if (error.response && error.response.data) {
+            if (error.response.data.message === 'not found') {
+              console.log('LIFF app not found'.info);
+            } else {
+              console.log(`Failed to delete LIFF view ${options.id.input}`.error);
+              console.error(error.response.data.error);
+              process.exit(1);
+            }
+          } else {
+            console.log(`Failed to delete LIFF view ${options.id.input}`.error);
+            console.error(error);
+            process.exit(1);
+          }
+        }
+
+        try {
+          viewNames = _index.LIFFConfig.getViewNamesById(options.id, config);
+          await Promise.all(viewNames.map(viewName => _index.LIFFConfig.unsetView(viewName)));
+          console.log(`Unset view(s) in Functions configuration`.info, viewNames);
+        } catch (error) {
+          console.log(`Failed to unset view(s) in Functions configuration`.error);
+          console.log(`Try looking for view name with LIFF ID ${options.id.input} using ${'fliff get'.prompt} command and unset it manually`.help);
+          console.log(`firebase functions:config:unset views.<viewName>`.prompt);
+          console.error(error);
+          process.exit(1);
+        }
+
+        break;
+
+      case 'get':
+        req = new _index.LIFFGetRequest({
+          accessToken
+        });
+
+        try {
+          console.log('Sending request to get LIFF view(s)...'.verbose);
+          res = await req.send();
+          console.table(res.data.apps.map(app => {
+            const views = Object.keys(config.views).filter(key => {
+              return config.views[key] === app.liffId;
+            });
+            return {
+              'View': views.join(', '),
+              'LIFF ID': app.liffId,
+              'Type': app.view.type,
+              'URL': app.view.url
+            };
+          }));
+        } catch (error) {
+          if (error.response && error.response.data) {
+            if (error.response.data.message === 'no apps') {
+              console.log('LIFF app not found'.info);
+              process.exit(0);
+            } else {
+              console.error(error.response.data.error);
+              process.exit(1);
+            }
+          } else {
+            console.error(error);
+            process.exit(1);
+          }
+        }
+
+        break;
+
+      case 'update':
+        req = new _index.LIFFUpdateRequest({
+          accessToken
+        });
+
+        if (!options.id && !options.name) {
+          console.warn(`Command ${'fliff update'.prompt} required LIFF ID or name option`.warn);
+          console.log(`Try re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help);
+          process.exit(1);
+        }
+
+        if (!options.id) {
+          options.id = _index.LIFFConfig.getViewIdByName(options.name, config);
+
+          if (typeof options.id !== 'string') {
+            console.error(`Failed to retrieve LIFF ID with view name ${options.name.input}`.error);
+            process.exit(1);
+          }
+        }
+
+        if (!options.name) {
+          options.name = _index.LIFFConfig.getViewNameById(options.id, config);
+
+          if (typeof options.name !== 'string') {
+            console.error(`Failed to retrieve view name with LIFF ID ${options.id.input}`.error);
+            process.exit(1);
+          }
+        }
+
+        if (!options.type || !options.url) {
+          console.warn(`Command ${'fliff update'.prompt} required both LIFF type AND url options to be updated`.warn);
+          console.log(`Try re-run with options ${'--type <type> --url <url>'.input}`.help);
+          process.exit(1);
+        }
+
+        data = {
+          type: options.type,
+          url: options.url
+        };
+
+        try {
+          console.log(`Sending request to update LIFF view ${options.id.input}`.verbose);
+          res = await req.send(options.id, data);
+          console.log(`Updated view with LIFF ID: ${options.id.input}`.verbose);
+        } catch (error) {
+          console.log(`Failed to update LIFF view ${options.id.input}`.error);
+
+          if (error.response && error.response.data && error.response.data.message) {
+            console.log(error.response.data.message.error, data);
+          } else {
+            console.error(error);
+          }
+
+          process.exit(1);
+        }
+
+        break;
+
+      default:
+    }
+  });
+} else if (operation) {
   switch (operation) {
-    case 'add':
-      req = new _index.LIFFAddRequest({
-        accessToken
-      });
-      data = {
-        view: {
-          type: cmd.type,
-          url: cmd.url
-        }
-      };
-
-      try {
-        console.log('Sending request to add LIFF view...'.verbose);
-        res = await req.send(data);
-      } catch (error) {
-        console.log(`Failed to add LIFF view`.error);
-        console.error(error);
-        process.exit(1);
-      }
-
-      try {
-        console.log(`Created ${cmd.name.input} view with LIFF ID: ${res.data.liffId.info}`.verbose);
-        await _index.LIFFConfig.setView(cmd.name, res.data.liffId);
-      } catch (error) {
-        console.log(`Failed to set Functions configuration`.error);
-        console.log(`Try re-run with the following command`.help);
-        console.log(`firebase functions:config:set views.${cmd.name}=${res.data.liffId}`.prompt);
-        console.error(error);
-        process.exit(1);
-      }
-
+    case 'version':
+      console.log(`Version: ${_package.default.version}`);
       break;
 
-    case 'delete':
-      req = new _index.LIFFDeleteRequest({
-        accessToken
-      });
+    case 'help':
+    default: // TODO: Display help message
 
-      if (!cmd.id && !cmd.name) {
-        console.warn(`Command ${'fliff delete'.prompt} required LIFF ID or name option`.warn);
-        console.log(`Try re-run ${'fliff delete --id <liffId>'.input} OR  ${'fliff delete --name <viewName>'.input}`.help);
-        process.exit(1);
-      }
-
-      if (cmd.name) {
-        cmd.id = _index.LIFFConfig.getViewIdByName(cmd.name, config);
-
-        if (typeof cmd.id !== 'string') {
-          console.error(`Failed to retrieve LIFF ID with view name ${cmd.name.input}`.error);
-          process.exit(1);
-        }
-      }
-
-      try {
-        console.log(`Sending request to delete LIFF view ${cmd.id.input}`.verbose);
-        res = await req.send(cmd.id);
-        console.log(`Deleted view with LIFF ID: ${cmd.id.input}`.verbose);
-      } catch (error) {
-        if (error.response && error.response.data) {
-          if (error.response.data.message === 'not found') {
-            console.log('LIFF app not found'.info);
-          } else {
-            console.log(`Failed to delete LIFF view ${cmd.id.input}`.error);
-            console.error(error.response.data.error);
-            process.exit(1);
-          }
-        } else {
-          console.log(`Failed to delete LIFF view ${cmd.id.input}`.error);
-          console.error(error);
-          process.exit(1);
-        }
-      }
-
-      try {
-        viewNames = _index.LIFFConfig.getViewNamesById(cmd.id, config);
-        await Promise.all(viewNames.map(viewName => _index.LIFFConfig.unsetView(viewName)));
-        console.log(`Unset view(s) in Functions configuration`.info, viewNames);
-      } catch (error) {
-        console.log(`Failed to unset view(s) in Functions configuration`.error);
-        console.log(`Try looking for view name with LIFF ID ${cmd.id.input} using ${'fliff get'.prompt} command and unset it manually`.help);
-        console.log(`firebase functions:config:unset views.<viewName>`.prompt);
-        console.error(error);
-        process.exit(1);
-      }
-
-      break;
-
-    case 'get':
-      req = new _index.LIFFGetRequest({
-        accessToken
-      });
-
-      try {
-        console.log('Sending request to get LIFF view(s)...'.verbose);
-        res = await req.send();
-        console.table(res.data.apps.map(app => {
-          const views = Object.keys(config.views).filter(key => {
-            return config.views[key] === app.liffId;
-          });
-          return {
-            'View': views.join(', '),
-            'LIFF ID': app.liffId,
-            'Type': app.view.type,
-            'URL': app.view.url
-          };
-        }));
-      } catch (error) {
-        if (error.response && error.response.data) {
-          if (error.response.data.message === 'no apps') {
-            console.log('LIFF app not found'.info);
-            process.exit(0);
-          } else {
-            console.error(error.response.data.error);
-            process.exit(1);
-          }
-        } else {
-          console.error(error);
-          process.exit(1);
-        }
-      }
-
-      break;
-
-    case 'update':
-      req = new _index.LIFFUpdateRequest({
-        accessToken
-      });
-
-      if (!cmd.id && !cmd.name) {
-        console.warn(`Command ${'fliff update'.prompt} required LIFF ID or name option`.warn);
-        console.log(`Try re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help);
-        process.exit(1);
-      }
-
-      if (!cmd.id) {
-        cmd.id = _index.LIFFConfig.getViewIdByName(cmd.name, config);
-
-        if (typeof cmd.id !== 'string') {
-          console.error(`Failed to retrieve LIFF ID with view name ${cmd.name.input}`.error);
-          process.exit(1);
-        }
-      }
-
-      if (!cmd.name) {
-        cmd.name = _index.LIFFConfig.getViewNameById(cmd.id, config);
-
-        if (typeof cmd.name !== 'string') {
-          console.error(`Failed to retrieve view name with LIFF ID ${cmd.id.input}`.error);
-          process.exit(1);
-        }
-      }
-
-      if (!cmd.type || !cmd.url) {
-        console.warn(`Command ${'fliff update'.prompt} required both LIFF type AND url options to be updated`.warn);
-        console.log(`Try re-run with options ${'--type <type> --url <url>'.input}`.help);
-        process.exit(1);
-      }
-
-      data = {
-        type: cmd.type,
-        url: cmd.url
-      };
-
-      try {
-        console.log(`Sending request to update LIFF view ${cmd.id.input}`.verbose);
-        res = await req.send(cmd.id, data);
-        console.log(`Updated view with LIFF ID: ${cmd.id.input}`.verbose);
-      } catch (error) {
-        console.log(`Failed to update LIFF view ${cmd.id.input}`.error);
-
-        if (error.response && error.response.data && error.response.data.message) {
-          console.log(error.response.data.message.error, data);
-        } else {
-          console.error(error);
-        }
-
-        process.exit(1);
-      }
-
-      break;
-
-    default:
   }
-});
-Commander.parse(process.argv);
+} else if (options.version) {
+  console.log(`Version: ${_package.default.version}`);
+}
 //# sourceMappingURL=cli.js.map
