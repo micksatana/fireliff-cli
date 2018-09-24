@@ -3,7 +3,7 @@ import { LIFFRequest } from '../lib/liff-request';
 
 describe('LIFFRequest', () => {
 
-    describe('when create instance with options.runtimeConfig', () => {
+    describe('when create instance with options.accessToken', () => {
         let req;
         let accessToken = 'someaccesstoken';
 

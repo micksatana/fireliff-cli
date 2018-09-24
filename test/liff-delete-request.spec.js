@@ -3,7 +3,7 @@ import { LIFFDeleteRequest } from '../lib/liff-delete-request';
 
 describe('LIFFDeleteRequest', () => {
 
-    describe('when create an instance with options.runtimeConfig', () => {
+    describe('when create an instance with options.accessToken', () => {
         let req;
         let accessToken = 'someaccesstoken';
 
