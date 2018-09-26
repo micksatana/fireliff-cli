@@ -28,6 +28,4 @@ async function getValidatedConfig() {
     process.exit(1);
   }
 }
-
-;
 //# sourceMappingURL=shared.js.map

@@ -50,7 +50,6 @@ class LIFFConfig {
 
   static getRichMenuIdByName(name, config) {
     return _functionsConfig.FunctionsConfig.getIdByName(LIFFConfig.RichMenusGroup, name, config);
-    ;
   }
 
 }
