@@ -190,4 +190,204 @@ describe('FunctionsConfig', () => {
 
     });
 
+    describe('when using group to get names by ID (getNamesById)', () => {
+        const group = 'views';
+        const id = 'test-asldfhah023';
+        const config = {
+            views: {
+                'test-get-view-name-1': id,
+                'test-get-view-name-2': id
+            }
+        };
+
+        describe('and without config', () => {
+            let result;
+
+            beforeAll(async () => {
+                spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
+                result = await FunctionsConfig.getNamesById(group, id);
+            });
+
+            it('should get config', () => {
+                expect(FunctionsConfig.get).toHaveBeenCalledTimes(1);
+            });
+
+            it('should get correct result', () => {
+                expect(result).toEqual(['test-get-view-name-1', 'test-get-view-name-2']);
+            });
+
+            afterAll(() => {
+                FunctionsConfig.get.restore();
+            });
+
+        });
+
+        describe('and with config', () => {
+            let result;
+
+            beforeAll(async () => {
+                spyOn(FunctionsConfig, 'get');
+                result = await FunctionsConfig.getNamesById(group, id, config);
+            });
+
+            it('should not get config', () => {
+                expect(FunctionsConfig.get).not.toBeCalled();
+            });
+
+            it('should get correct result', () => {
+                expect(result).toEqual(['test-get-view-name-1', 'test-get-view-name-2']);
+            });
+
+            afterAll(() => {
+                FunctionsConfig.get.restore();
+            });
+
+        });
+
+        describe('and the ID not exists', () => {
+            let result;
+
+            beforeAll(async () => {
+                spyOn(FunctionsConfig, 'get');
+                result = await FunctionsConfig.getNamesById(group, 'some-unknown-id', config);
+            });
+
+            it('should not get config', () => {
+                expect(FunctionsConfig.get).not.toBeCalled();
+            });
+
+            it('should get correct result', () => {
+                expect(result).toEqual([]);
+            });
+
+            afterAll(() => {
+                FunctionsConfig.get.restore();
+            });
+
+        });
+
+        describe('and group not exists', () => {
+            let result;
+
+            beforeAll(async () => {
+                spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
+                result = await FunctionsConfig.getNamesById('unknown-group', 'some-unknown-id', config);
+            });
+
+            it('should get config', () => {
+                expect(FunctionsConfig.get).toHaveBeenCalledTimes(1);
+            });
+
+            it('should get correct result', () => {
+                expect(result).toEqual([]);
+            });
+
+            afterAll(() => {
+                FunctionsConfig.get.restore();
+            });
+
+        });
+
+    });
+
+    describe('when using group to get ID by name (getIdByName)', () => {
+        const group = 'views';
+        const name = 'test-get-view-name-2';
+        const config = {
+            views: {
+                'test-get-view-name-1': 'test-gsdfo8hfosh',
+                'test-get-view-name-2': 'test-sdflashe8fa'
+            }
+        };
+
+        describe('and without config', () => {
+            let result;
+
+            beforeAll(async () => {
+                spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
+                result = await FunctionsConfig.getIdByName(group, name);
+            });
+
+            it('should get config', () => {
+                expect(FunctionsConfig.get).toHaveBeenCalledTimes(1);
+            });
+
+            it('should get correct result', () => {
+                expect(result).toEqual(config.views[name]);
+            });
+
+            afterAll(() => {
+                FunctionsConfig.get.restore();
+            });
+
+        });
+
+        describe('and with config', () => {
+            let result;
+
+            beforeAll(async () => {
+                spyOn(FunctionsConfig, 'get');
+                result = await FunctionsConfig.getIdByName(group, name, config);
+            });
+
+            it('should not get config', () => {
+                expect(FunctionsConfig.get).not.toBeCalled();
+            });
+
+            it('should get correct result', () => {
+                expect(result).toEqual(config.views[name]);
+            });
+
+            afterAll(() => {
+                FunctionsConfig.get.restore();
+            });
+
+        });
+
+        describe('and the name not exists', () => {
+            let result;
+
+            beforeAll(async () => {
+                spyOn(FunctionsConfig, 'get');
+                result = await FunctionsConfig.getIdByName(group, 'some-unknown-name', config);
+            });
+
+            it('should not get config', () => {
+                expect(FunctionsConfig.get).not.toBeCalled();
+            });
+
+            it('should get correct result', () => {
+                expect(result).toEqual(null);
+            });
+
+            afterAll(() => {
+                FunctionsConfig.get.restore();
+            });
+
+        });
+
+        describe('and group not exists', () => {
+            let result;
+
+            beforeAll(async () => {
+                spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
+                result = await FunctionsConfig.getIdByName('unknown-group', name, config);
+            });
+
+            it('should get config', () => {
+                expect(FunctionsConfig.get).toHaveBeenCalledTimes(1);
+            });
+
+            it('should get correct result', () => {
+                expect(result).toEqual(null);
+            });
+
+            afterAll(() => {
+                FunctionsConfig.get.restore();
+            });
+
+        });
+
+    });
+
 });

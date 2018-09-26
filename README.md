@@ -65,11 +65,40 @@ fliff delete --name <viewName>
 fliff get
 ```
 
-## How to retrieve LIFF View IDs in Firebase Functions
+### Add RichMenu
+```
+richmenu add --name <richMenuName> --data <dataFile> --image <imageFile>
+```
+
+### Update RichMenu
+LINE Rich Menu API currently not support `PUT` method which means you cannot update the rich menu. The workaround is add new menu and delete the old one.
+
+### Delete RichMenu
+Update using RichMenu ID
+```
+richmenu delete --id <richMenuId>
+```
+Update using RichMenu name
+```
+richmenu delete --name <richMenuName>
+```
+
+### Get RichMenu
+To display existing rich menus, run the following command. This will display existing rich menus in table.
+```
+richmenu get
+```
+Or if you need more detail, such as `areas` property, run with `--detail` option. This will display as object.
+```
+richmenu get --detail
+```
+
+## How to retrieve LIFF View IDs or RichMenu in Firebase Functions
 You can get LIFF view IDs programmatically, in your Firebase Functions project using the following code.
 ```
 import * as functions from 'firebase-functions';
 const views = functions.config().views;
+const richMenus = functions.config().richmenus;
 ```
 Let's say you have a view named sign_up, you can create URL using LIFF ID in `views` like this.
 ```

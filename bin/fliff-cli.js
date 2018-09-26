@@ -7,7 +7,9 @@ var colors = _interopRequireWildcard(require("colors"));
 
 var _package = _interopRequireDefault(require("../package.json"));
 
-var _index = require("./index");
+var _ = require(".");
+
+var _shared = require("./shared");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56,33 +58,10 @@ const options = commandLineArgs([{
   type: Boolean
 }], {
   argv
-});
-
-async function getConfig() {
-  try {
-    console.log('Get Firebase Functions configuration'.verbose);
-    let config = await _index.FunctionsConfig.get();
-
-    if (!config.line || !config.line.access_token) {
-      console.log('Functions configuration not found: line.access_token'.help);
-      console.log('Find your LINE channel access token and use with the following command'.help);
-      console.log(`${'firebase functions:config:set line.access_token='.code}${'<channelAccessToken>'.prompt}`);
-      process.exit(1);
-    }
-
-    return config;
-  } catch (error) {
-    console.log('Failed to get configuration'.error);
-    console.log('Suggestions:'.info);
-    console.log(`Run ${'firebase init'.code} to start a project directory in the current folder.`.verbose);
-    console.log(`Run ${'firebase use --add'.code} to set active project.`.verbose);
-    process.exit(1);
-  }
-} // Commands that need Functions config
-
+}); // Commands that need Functions config
 
 if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
-  getConfig().then(async config => {
+  (0, _shared.getValidatedConfig)().then(async config => {
     let accessToken = config.line.access_token;
     let viewNames;
     let data;
@@ -91,7 +70,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
 
     switch (operation) {
       case 'add':
-        req = new _index.LIFFAddRequest({
+        req = new _.LIFFAddRequest({
           accessToken
         });
         data = {
@@ -112,7 +91,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
 
         try {
           console.log(`Created ${options.name.input} view with LIFF ID: ${res.data.liffId.info}`.verbose);
-          await _index.LIFFConfig.setView(options.name, res.data.liffId);
+          await _.LIFFConfig.setView(options.name, res.data.liffId);
         } catch (error) {
           console.log(`Failed to set Functions configuration`.error);
           console.log(`Try re-run with the following command`.help);
@@ -124,7 +103,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         break;
 
       case 'delete':
-        req = new _index.LIFFDeleteRequest({
+        req = new _.LIFFDeleteRequest({
           accessToken
         });
 
@@ -135,7 +114,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         }
 
         if (options.name) {
-          options.id = _index.LIFFConfig.getViewIdByName(options.name, config);
+          options.id = await _.LIFFConfig.getViewIdByName(options.name, config);
 
           if (typeof options.id !== 'string') {
             console.error(`Failed to retrieve LIFF ID with view name ${options.name.input}`.error);
@@ -164,8 +143,8 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         }
 
         try {
-          viewNames = _index.LIFFConfig.getViewNamesById(options.id, config);
-          await Promise.all(viewNames.map(viewName => _index.LIFFConfig.unsetView(viewName)));
+          viewNames = await _.LIFFConfig.getViewNamesById(options.id, config);
+          await Promise.all(viewNames.map(viewName => _.LIFFConfig.unsetView(viewName)));
           console.log(`Unset view(s) in Functions configuration`.info, viewNames);
         } catch (error) {
           console.log(`Failed to unset view(s) in Functions configuration`.error);
@@ -178,7 +157,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         break;
 
       case 'get':
-        req = new _index.LIFFGetRequest({
+        req = new _.LIFFGetRequest({
           accessToken
         });
 
@@ -214,7 +193,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         break;
 
       case 'update':
-        req = new _index.LIFFUpdateRequest({
+        req = new _.LIFFUpdateRequest({
           accessToken
         });
 
@@ -225,7 +204,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         }
 
         if (!options.id) {
-          options.id = _index.LIFFConfig.getViewIdByName(options.name, config);
+          options.id = await _.LIFFConfig.getViewIdByName(options.name, config);
 
           if (typeof options.id !== 'string') {
             console.error(`Failed to retrieve LIFF ID with view name ${options.name.input}`.error);
@@ -234,7 +213,7 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         }
 
         if (!options.name) {
-          options.name = _index.LIFFConfig.getViewNameById(options.id, config);
+          options.name = await _.LIFFConfig.getViewNameById(options.id, config);
 
           if (typeof options.name !== 'string') {
             console.error(`Failed to retrieve view name with LIFF ID ${options.id.input}`.error);
@@ -287,4 +266,4 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
 } else if (options.version) {
   console.log(`Version: ${_package.default.version}`);
 }
-//# sourceMappingURL=cli.js.map
+//# sourceMappingURL=fliff-cli.js.map

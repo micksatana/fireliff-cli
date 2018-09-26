@@ -60,6 +60,40 @@ class FunctionsConfig {
     });
   }
 
+  static async getNamesById(group, id, config) {
+    const names = [];
+
+    if (!config || !config[group]) {
+      config = await FunctionsConfig.get();
+    }
+
+    if (config && config[group]) {
+      for (let name in config[group]) {
+        if (config[group][name] === id) {
+          names.push(name);
+        }
+      }
+    }
+
+    return names;
+  }
+
+  static async getIdByName(group, name, config) {
+    if (!config || !config[group]) {
+      config = await FunctionsConfig.get();
+    }
+
+    if (config && config[group]) {
+      for (let prop in config[group]) {
+        if (prop === name) {
+          return config[group][prop];
+        }
+      }
+    }
+
+    return null;
+  }
+
 }
 
 exports.FunctionsConfig = FunctionsConfig;

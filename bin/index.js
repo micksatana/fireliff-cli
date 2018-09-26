@@ -45,6 +45,36 @@ Object.defineProperty(exports, "LIFFRequest", {
     return _liffRequest.LIFFRequest;
   }
 });
+Object.defineProperty(exports, "RichMenuAddRequest", {
+  enumerable: true,
+  get: function () {
+    return _richMenuAddRequest.RichMenuAddRequest;
+  }
+});
+Object.defineProperty(exports, "RichMenuDeleteRequest", {
+  enumerable: true,
+  get: function () {
+    return _richMenuDeleteRequest.RichMenuDeleteRequest;
+  }
+});
+Object.defineProperty(exports, "RichMenuGetRequest", {
+  enumerable: true,
+  get: function () {
+    return _richMenuGetRequest.RichMenuGetRequest;
+  }
+});
+Object.defineProperty(exports, "RichMenuRequest", {
+  enumerable: true,
+  get: function () {
+    return _richMenuRequest.RichMenuRequest;
+  }
+});
+Object.defineProperty(exports, "RichMenuUploadRequest", {
+  enumerable: true,
+  get: function () {
+    return _richMenuUploadRequest.RichMenuUploadRequest;
+  }
+});
 
 var _functionsConfig = require("./functions-config");
 
@@ -59,4 +89,14 @@ var _liffGetRequest = require("./liff-get-request");
 var _liffUpdateRequest = require("./liff-update-request");
 
 var _liffRequest = require("./liff-request");
+
+var _richMenuAddRequest = require("./rich-menu-add-request");
+
+var _richMenuDeleteRequest = require("./rich-menu-delete-request");
+
+var _richMenuGetRequest = require("./rich-menu-get-request");
+
+var _richMenuRequest = require("./rich-menu-request");
+
+var _richMenuUploadRequest = require("./rich-menu-upload-request");
 //# sourceMappingURL=index.js.map

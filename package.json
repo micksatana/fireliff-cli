@@ -1,15 +1,16 @@
 {
   "name": "@intocode-io/fireliff-cli",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Command line interface for building LIFF app on Firebase",
   "main": "lib/index.js",
   "bin": {
-    "fliff": "bin/cli.js"
+    "fliff": "bin/fliff-cli.js",
+    "richmenu": "bin/richmenu-cli.js"
   },
   "scripts": {
     "clean": "rimraf bin",
     "coverage": "jest --coverage",
-    "build": "npm run clean && babel lib --out-dir bin --source-maps --quiet && chmod +x bin/cli.js",
+    "build": "npm run clean && babel lib --out-dir bin --source-maps --quiet && chmod +x bin/*-cli.js",
     "lint": "eslint .",
     "test": "jest"
   },
@@ -41,8 +42,10 @@
   "devDependencies": {
     "@babel/cli": "^7.1.0",
     "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
     "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.0.0",
     "babel-jest": "^23.6.0",
     "eslint": "^5.6.0",
     "eslint-plugin-jest": "^21.22.1",
