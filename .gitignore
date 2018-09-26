@@ -65,3 +65,6 @@ typings/
 firebase.json
 functions
 public
+
+# OS
+.DS_Store
