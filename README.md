@@ -23,7 +23,7 @@ firebase use --add
 ## Installation
 Install FireLIFF CLI
 ```
-npm i -g fireliff-cli
+npm i -g @intocode-io/fireliff-cli
 ```
 Set LINE channel access token
 ```
