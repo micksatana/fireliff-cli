@@ -13,3 +13,7 @@
 ### Added
  - `fliff`
     - Can add, update, get, delete LIFF apps
+
+## [1.1.0] - 2018-10-26
+ - `fliff init`
+    - Can generate LIFF app project in `web-views` folder

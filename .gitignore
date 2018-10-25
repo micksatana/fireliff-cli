@@ -71,3 +71,6 @@ public
 
 # Cache
 test/cache
+
+# Template
+templates/web-views/package-lock.json

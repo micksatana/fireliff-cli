@@ -1,0 +1,20 @@
+{
+  "name": "web-views",
+  "description": "LIFF web views",
+  "dependencies": {
+    "firebase": "^5.5.5"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.10.3",
+    "shx": "^0.3.2"
+  },
+  "scripts": {
+    "build:staging": "firebase use staging && npm run copy:images && NODE_ENV=staging parcel build src/*.html --no-cache",
+    "build:production": "firebase use production && npm run copy:images && NODE_ENV=production parcel build src/*.html --no-cache",
+    "clean:dist": "shx rm -Rf dist/*",
+    "copy:images": "npm run clean:dist && shx cp -r src/images dist/images",
+    "deploy:staging": "npm run build:staging && firebase deploy --only hosting",
+    "deploy:production": "npm run build:production && firebase deploy --only hosting",
+    "dev": "NODE_ENV=staging parcel serve src/*.html"
+  }
+}

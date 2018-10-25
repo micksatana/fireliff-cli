@@ -3,7 +3,7 @@
 
 require("console.table");
 
-var colors = _interopRequireWildcard(require("colors"));
+var path = _interopRequireWildcard(require("path"));
 
 var _package = _interopRequireDefault(require("../package.json"));
 
@@ -11,22 +11,11 @@ var _ = require(".");
 
 var _shared = require("./shared");
 
+var _fliff = require("./fliff.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
-
-colors.setTheme({
-  silly: 'rainbow',
-  input: 'grey',
-  verbose: 'cyan',
-  prompt: 'grey',
-  info: 'green',
-  data: 'white',
-  help: 'cyan',
-  warn: 'yellow',
-  code: 'blue',
-  error: 'red'
-});
 
 const commandLineArgs = require('command-line-args');
 
@@ -255,6 +244,11 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
   });
 } else if (operation) {
   switch (operation) {
+    case 'init':
+      _fliff.FLIFF.init(path.resolve(process.cwd(), 'web-views'));
+
+      break;
+
     case 'version':
       console.log(`Version: ${_package.default.version}`);
       break;

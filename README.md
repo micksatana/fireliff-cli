@@ -35,6 +35,14 @@ firebase functions:config:set hosting.url=<hostingUrl>
 ```
 ## Usage
 
+### Init LIFF project
+This command should be run first time under Firebase project root folder which containing `firebase.json`.
+```
+fliff init
+```
+After run successfully, you will get a `web-views` LIFF project folder. This sub-project is a boilerplate with Parcel Bundler. You can change directory into `web-views` and run `npm run dev` to start LIFF App development. See [Develop LIFF Web Views](#develop-liff-web-views)
+
+
 ### Add LIFF view
 ```
 fliff add --name <viewName> --type <viewType> --url <viewUrl>
@@ -93,6 +101,55 @@ Or if you need more detail, such as `areas` property, run with `--detail` option
 richmenu get --detail
 ```
 
+## Develop LIFF Web Views
+### Performance consideration
+Each web view will be loaded inside LINE app when LINE user open a `line://app/{view}`. So to load each web view faster, it's recommended to avoid using single-page app approach but create a set of files for each page using the following pattern instead.
+```
+web-views/src/some-view.html
+web-views/src/some-view.js
+web-views/src/some-view.css
+```
+It's recommended to load only neccessary library in the html file; for example, the LIFF SDK. And use Parcel Bundler to import other libraries as needed. Parcel Bundler will help to several things; including Tree-shaking which will reduce JavaScript payloads.
+### Environment file naming
+The boilerplate has two environments; `production` and `staging`. But you can create more if needed. Environment file uses the following format
+```
+web-views/.env.{process.NODE_ENV}
+```
+### Environment and Firebase project alias
+Environment must be aligned with Firebase project alias. Run `firebase use` to see all aliases. If you don't have `staging` and `production` aliases, you can add them by run the following command.
+```
+firebase use --add
+```
+
+### Firebase app initialization
+In the environment file, we have two default variables; `FIREBASE_API_KEY` and `FIREBASE_API_PROJECT_ID`, which needed during firebase app initialization.
+```
+import firebase from 'firebase/app';
+
+firebase.initializeApp({
+    apiKey: process.env.FIREBASE_API_KEY,
+    projectId: process.env.FIREBASE_API_PROJECT_ID
+});
+```
+
+### LIFF initialization
+You can access `liff` variable in any JavaScript file as long as the JavaScript file is loaded in an HTML page which include LIFF SDK script.
+```
+liff.init(
+     data => console.log(data.context),
+     error => console.log(error)
+);
+```
+
+### Deploy to staging environment
+```
+cd web-views
+npm run deploy:staging
+```
+This command will clean `web-views/dist`, re-build and deploy to Firebase Hosting.
+
+After complete, you can [add LIFF view](#add-liff-view). The command will add LIFF view to LINE and configure Firebase Functions for you.
+
 ## How to retrieve LIFF View IDs or RichMenu in Firebase Functions
 You can get LIFF view IDs programmatically, in your Firebase Functions project using the following code.
 ```
@@ -100,11 +157,12 @@ import * as functions from 'firebase-functions';
 const views = functions.config().views;
 const richMenus = functions.config().richmenus;
 ```
-Let's say you have a view named sign_up, you can create URL using LIFF ID in `views` like this.
+Let's say you previously add a view named `some_view`, you can create URL using LIFF ID in `views` like this.
 ```
-const signUpUrl = `line://app/${views.sign_up}`;
+const signUpUrl = `line://app/${views.some_view}`;
 ```
 
+When LINE user access this view `line://app/${views.some_view}`, the user will see `web-views/src/some-view.html` hosted on Firebase Hosting.
 
 ## LICENSE
 
