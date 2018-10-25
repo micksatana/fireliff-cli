@@ -68,3 +68,6 @@ public
 
 # OS
 .DS_Store
+
+# Cache
+test/cache
