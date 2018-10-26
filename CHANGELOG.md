@@ -1,6 +1,7 @@
 # Changelog
 
 ## [1.2.0] - 2018-10-26
+### Added
  - `fliff init`
     - Can generate LIFF app project in `web-views` folder
 
