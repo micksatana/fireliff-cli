@@ -8,7 +8,7 @@ describe('RichMenuDeleteRequest', () => {
         let accessToken = 'someaccesstoken';
 
         beforeAll(() => {
-            spyOn(Axios, 'create').and.callThrough();
+            jest.spyOn(Axios, 'create');
             req = new RichMenuDeleteRequest({ accessToken });
         });
 
@@ -17,7 +17,7 @@ describe('RichMenuDeleteRequest', () => {
         });
 
         it('should create axios instance with correct headers for LINE API', () => {
-            expect(Axios.create).toBeCalledWith({
+            expect(Axios.create).toHaveBeenCalledWith({
                 headers: {
                     'authorization': `Bearer ${accessToken}`,
                     'content-type': 'application/json'
@@ -29,20 +29,20 @@ describe('RichMenuDeleteRequest', () => {
         describe('when send richMenuId', () => {
             let richMenuId = 'sdlfjoee';
             beforeAll(() => {
-                spyOn(req.axios, 'delete').and.returnValue(Promise.resolve('any'));
+                jest.spyOn(req.axios, 'delete').mockResolvedValue('any');
                 req.send(richMenuId);
             });
             it('should call to correct endpoint', () => {
                 expect(req.axios.delete).toHaveBeenCalledTimes(1);
-                expect(req.axios.delete).toBeCalledWith(`${req.endpoint}/${richMenuId}`);
+                expect(req.axios.delete).toHaveBeenCalledWith(`${req.endpoint}/${richMenuId}`);
             });
             afterAll(() => {
-                req.axios.delete.restore();
+                req.axios.delete.mockRestore();
             });
         });
 
         afterAll(() => {
-            Axios.create.restore();
+            Axios.create.mockRestore();
         });
 
     });

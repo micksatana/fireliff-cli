@@ -5,46 +5,46 @@ describe('LIFFConfig', () => {
 
     describe('setView', () => {
         beforeAll(() => {
-            spyOn(FunctionsConfig, 'set').and.callFake((_, value) => Promise.resolve(value));
+            jest.spyOn(FunctionsConfig, 'set').mockImplementation((_, value) => Promise.resolve(value));
             LIFFConfig.setView('testname', 'testvalue');
         });
 
         it('should set to correct config group', () => {
-            expect(FunctionsConfig.set).toBeCalledWith(`${LIFFConfig.ViewsGroup}.testname`, 'testvalue');
+            expect(FunctionsConfig.set).toHaveBeenCalledWith(`${LIFFConfig.ViewsGroup}.testname`, 'testvalue');
         });
 
         afterAll(() => {
-            FunctionsConfig.set.restore();
+            FunctionsConfig.set.mockRestore();
         });
     });
 
     describe('unsetView', () => {
         beforeAll(() => {
-            spyOn(FunctionsConfig, 'unset').and.callFake((name) => Promise.resolve(name));
+            jest.spyOn(FunctionsConfig, 'unset').mockImplementation((name) => Promise.resolve(name));
             LIFFConfig.unsetView('testname', 'testvalue');
         });
 
         it('should unset to correct config group', () => {
-            expect(FunctionsConfig.unset).toBeCalledWith(`${LIFFConfig.ViewsGroup}.testname`);
+            expect(FunctionsConfig.unset).toHaveBeenCalledWith(`${LIFFConfig.ViewsGroup}.testname`);
         });
 
         afterAll(() => {
-            FunctionsConfig.unset.restore();
+            FunctionsConfig.unset.mockRestore();
         });
     });
 
     describe('getViewNamesById', () => {
         beforeAll(() => {
-            spyOn(FunctionsConfig, 'getNamesById').and.callFake(() => Promise.resolve([]));
+            jest.spyOn(FunctionsConfig, 'getNamesById').mockImplementation(() => Promise.resolve([]));
             LIFFConfig.getViewNamesById('testid', {});
         });
 
         it('should unset to correct config group', () => {
-            expect(FunctionsConfig.getNamesById).toBeCalledWith(LIFFConfig.ViewsGroup, 'testid', {});
+            expect(FunctionsConfig.getNamesById).toHaveBeenCalledWith(LIFFConfig.ViewsGroup, 'testid', {});
         });
 
         afterAll(() => {
-            FunctionsConfig.getNamesById.restore();
+            FunctionsConfig.getNamesById.mockRestore();
         });
     });
 
@@ -54,12 +54,12 @@ describe('LIFFConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(LIFFConfig, 'getViewNamesById').and.callFake(() => Promise.resolve(['name-1', 'name-2']));
+                jest.spyOn(LIFFConfig, 'getViewNamesById').mockImplementation(() => Promise.resolve(['name-1', 'name-2']));
                 result = await LIFFConfig.getViewNameById('testid', {});
             });
 
             it('should get names', () => {
-                expect(LIFFConfig.getViewNamesById).toBeCalledWith('testid', {});
+                expect(LIFFConfig.getViewNamesById).toHaveBeenCalledWith('testid', {});
             });
 
             it('should get correct result', () => {
@@ -67,7 +67,7 @@ describe('LIFFConfig', () => {
             });
 
             afterAll(() => {
-                LIFFConfig.getViewNamesById.restore();
+                LIFFConfig.getViewNamesById.mockRestore();
             });
 
         });
@@ -76,12 +76,12 @@ describe('LIFFConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(LIFFConfig, 'getViewNamesById').and.callFake(() => Promise.resolve([]));
+                jest.spyOn(LIFFConfig, 'getViewNamesById').mockImplementation(() => Promise.resolve([]));
                 result = await LIFFConfig.getViewNameById('testid', {});
             });
 
             it('should get names', () => {
-                expect(LIFFConfig.getViewNamesById).toBeCalledWith('testid', {});
+                expect(LIFFConfig.getViewNamesById).toHaveBeenCalledWith('testid', {});
             });
 
             it('should get correct result', () => {
@@ -89,7 +89,7 @@ describe('LIFFConfig', () => {
             });
 
             afterAll(() => {
-                LIFFConfig.getViewNamesById.restore();
+                LIFFConfig.getViewNamesById.mockRestore();
             });
 
         });
@@ -98,61 +98,61 @@ describe('LIFFConfig', () => {
 
     describe('getViewIdByName', () => {
         beforeAll(() => {
-            spyOn(FunctionsConfig, 'getIdByName').and.callFake(() => Promise.resolve([]));
+            jest.spyOn(FunctionsConfig, 'getIdByName').mockImplementation(() => Promise.resolve([]));
             LIFFConfig.getViewIdByName('testname', {});
         });
 
         it('should unset to correct config group', () => {
-            expect(FunctionsConfig.getIdByName).toBeCalledWith(LIFFConfig.ViewsGroup, 'testname', {});
+            expect(FunctionsConfig.getIdByName).toHaveBeenCalledWith(LIFFConfig.ViewsGroup, 'testname', {});
         });
 
         afterAll(() => {
-            FunctionsConfig.getIdByName.restore();
+            FunctionsConfig.getIdByName.mockRestore();
         });
     });
 
     describe('setRichMenu', () => {
         beforeAll(() => {
-            spyOn(FunctionsConfig, 'set').and.callFake((_, value) => Promise.resolve(value));
+            jest.spyOn(FunctionsConfig, 'set').mockImplementation((_, value) => Promise.resolve(value));
             LIFFConfig.setRichMenu('testname', 'testvalue');
         });
 
         it('should set to correct config group', () => {
-            expect(FunctionsConfig.set).toBeCalledWith(`${LIFFConfig.RichMenusGroup}.testname`, 'testvalue');
+            expect(FunctionsConfig.set).toHaveBeenCalledWith(`${LIFFConfig.RichMenusGroup}.testname`, 'testvalue');
         });
 
         afterAll(() => {
-            FunctionsConfig.set.restore();
+            FunctionsConfig.set.mockRestore();
         });
     });
 
     describe('unsetRichMenu', () => {
         beforeAll(() => {
-            spyOn(FunctionsConfig, 'unset').and.callFake((name) => Promise.resolve(name));
+            jest.spyOn(FunctionsConfig, 'unset').mockImplementation((name) => Promise.resolve(name));
             LIFFConfig.unsetRichMenu('testname', 'testvalue');
         });
 
         it('should unset to correct config group', () => {
-            expect(FunctionsConfig.unset).toBeCalledWith(`${LIFFConfig.RichMenusGroup}.testname`);
+            expect(FunctionsConfig.unset).toHaveBeenCalledWith(`${LIFFConfig.RichMenusGroup}.testname`);
         });
 
         afterAll(() => {
-            FunctionsConfig.unset.restore();
+            FunctionsConfig.unset.mockRestore();
         });
     });
 
     describe('getRichMenuNamesById', () => {
         beforeAll(() => {
-            spyOn(FunctionsConfig, 'getNamesById').and.callFake(() => Promise.resolve([]));
+            jest.spyOn(FunctionsConfig, 'getNamesById').mockImplementation(() => Promise.resolve([]));
             LIFFConfig.getRichMenuNamesById('testid', {});
         });
 
         it('should unset to correct config group', () => {
-            expect(FunctionsConfig.getNamesById).toBeCalledWith(LIFFConfig.RichMenusGroup, 'testid', {});
+            expect(FunctionsConfig.getNamesById).toHaveBeenCalledWith(LIFFConfig.RichMenusGroup, 'testid', {});
         });
 
         afterAll(() => {
-            FunctionsConfig.getNamesById.restore();
+            FunctionsConfig.getNamesById.mockRestore();
         });
     });
 
@@ -162,12 +162,12 @@ describe('LIFFConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(LIFFConfig, 'getRichMenuNamesById').and.callFake(() => Promise.resolve(['name-1', 'name-2']));
+                jest.spyOn(LIFFConfig, 'getRichMenuNamesById').mockImplementation(() => Promise.resolve(['name-1', 'name-2']));
                 result = await LIFFConfig.getRichMenuNameById('testid', {});
             });
 
             it('should get names', () => {
-                expect(LIFFConfig.getRichMenuNamesById).toBeCalledWith('testid', {});
+                expect(LIFFConfig.getRichMenuNamesById).toHaveBeenCalledWith('testid', {});
             });
 
             it('should get correct result', () => {
@@ -175,7 +175,7 @@ describe('LIFFConfig', () => {
             });
 
             afterAll(() => {
-                LIFFConfig.getRichMenuNamesById.restore();
+                LIFFConfig.getRichMenuNamesById.mockRestore();
             });
 
         });
@@ -184,12 +184,12 @@ describe('LIFFConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(LIFFConfig, 'getRichMenuNamesById').and.callFake(() => Promise.resolve([]));
+                jest.spyOn(LIFFConfig, 'getRichMenuNamesById').mockImplementation(() => Promise.resolve([]));
                 result = await LIFFConfig.getRichMenuNameById('testid', {});
             });
 
             it('should get names', () => {
-                expect(LIFFConfig.getRichMenuNamesById).toBeCalledWith('testid', {});
+                expect(LIFFConfig.getRichMenuNamesById).toHaveBeenCalledWith('testid', {});
             });
 
             it('should get correct result', () => {
@@ -197,7 +197,7 @@ describe('LIFFConfig', () => {
             });
 
             afterAll(() => {
-                LIFFConfig.getRichMenuNamesById.restore();
+                LIFFConfig.getRichMenuNamesById.mockRestore();
             });
 
         });
@@ -206,16 +206,16 @@ describe('LIFFConfig', () => {
 
     describe('getRichMenuIdByName', () => {
         beforeAll(() => {
-            spyOn(FunctionsConfig, 'getIdByName').and.callFake(() => Promise.resolve([]));
+            jest.spyOn(FunctionsConfig, 'getIdByName').mockImplementation(() => Promise.resolve([]));
             LIFFConfig.getRichMenuIdByName('testname', {});
         });
 
         it('should unset to correct config group', () => {
-            expect(FunctionsConfig.getIdByName).toBeCalledWith(LIFFConfig.RichMenusGroup, 'testname', {});
+            expect(FunctionsConfig.getIdByName).toHaveBeenCalledWith(LIFFConfig.RichMenusGroup, 'testname', {});
         });
 
         afterAll(() => {
-            FunctionsConfig.getIdByName.restore();
+            FunctionsConfig.getIdByName.mockRestore();
         });
     });
 

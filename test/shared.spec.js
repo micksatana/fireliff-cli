@@ -4,7 +4,7 @@ import { FunctionsConfig } from '../lib/functions-config';
 describe('getValidatedConfig', () => {
     beforeAll(() => {
         // getValidatedConfig display lots of things via console.log, we don't want to see while testing
-        spyOn(console, 'log').and.callFake(() => {});
+        jest.spyOn(console, 'log').mockImplementation(() => {});
     });
     
     describe('when able to get config with line.access_token', () => {
@@ -23,7 +23,7 @@ describe('getValidatedConfig', () => {
         let result;
 
         beforeAll(async () => {
-            spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
+            jest.spyOn(FunctionsConfig, 'get').mockResolvedValue(config);
             result = await getValidatedConfig();
         });
 
@@ -36,7 +36,7 @@ describe('getValidatedConfig', () => {
         });
 
         afterAll(() => {
-            FunctionsConfig.get.restore();
+            FunctionsConfig.get.mockRestore();
         });
 
     });
@@ -53,8 +53,8 @@ describe('getValidatedConfig', () => {
         };
 
         beforeAll(async () => {
-            spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
-            spyOn(process, 'exit').and.callFake(() => {});
+            jest.spyOn(FunctionsConfig, 'get').mockResolvedValue(config);
+            jest.spyOn(process, 'exit').mockImplementation(() => {});
             await getValidatedConfig();
         });
 
@@ -64,12 +64,12 @@ describe('getValidatedConfig', () => {
 
         it('should exit with status 1', () => {
             expect(process.exit).toHaveBeenCalledTimes(1);
-            expect(process.exit).toBeCalledWith(1);
+            expect(process.exit).toHaveBeenCalledWith(1);
         });
 
         afterAll(() => {
-            FunctionsConfig.get.restore();
-            process.exit.restore();
+            FunctionsConfig.get.mockRestore();
+            process.exit.mockRestore();
         });
 
     });
@@ -78,8 +78,10 @@ describe('getValidatedConfig', () => {
         const expectedError = new Error('Error while getting config');
 
         beforeAll(async () => {
-            spyOn(FunctionsConfig, 'get').and.throwError(expectedError);
-            spyOn(process, 'exit').and.callFake(() => {});
+            jest.spyOn(FunctionsConfig, 'get').mockImplementation(() => {
+                throw expectedError;
+            });
+            jest.spyOn(process, 'exit').mockImplementation(() => {});
             await getValidatedConfig();
         });
 
@@ -89,17 +91,17 @@ describe('getValidatedConfig', () => {
 
         it('should exit with status 1', () => {
             expect(process.exit).toHaveBeenCalledTimes(1);
-            expect(process.exit).toBeCalledWith(1);
+            expect(process.exit).toHaveBeenCalledWith(1);
         });
 
         afterAll(() => {
-            FunctionsConfig.get.restore();
-            process.exit.restore();
+            FunctionsConfig.get.mockRestore();
+            process.exit.mockRestore();
         });
 
     });
 
     afterAll(() => {
-        console.log.restore();
+        console.log.mockRestore();
     });
 });

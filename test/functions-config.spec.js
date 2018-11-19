@@ -25,7 +25,7 @@ describe('FunctionsConfig', () => {
             });
 
             it('should execute with correct command', () => {
-                expect(ChildProcess.exec).toBeCalledWith(`firebase functions:config:get`, expect.anything());
+                expect(ChildProcess.exec).toHaveBeenCalledWith(`firebase functions:config:get`, expect.anything());
             });
 
             it('should return Firebase Functions config', () => {
@@ -33,7 +33,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                ChildProcess.exec.restore();
+                ChildProcess.exec.mockRestore();
             });
 
         });
@@ -48,7 +48,7 @@ describe('FunctionsConfig', () => {
             });
 
             it('should execute with correct command', () => {
-                expect(ChildProcess.exec).toBeCalledWith(`firebase functions:config:get ${fakeParam}`, expect.anything());
+                expect(ChildProcess.exec).toHaveBeenCalledWith(`firebase functions:config:get ${fakeParam}`, expect.anything());
             });
 
             it('should return Firebase Functions config', () => {
@@ -56,7 +56,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                ChildProcess.exec.restore();
+                ChildProcess.exec.mockRestore();
             });
 
         });
@@ -73,7 +73,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                ChildProcess.exec.restore();
+                ChildProcess.exec.mockRestore();
             });
 
         });
@@ -83,7 +83,9 @@ describe('FunctionsConfig', () => {
 
             beforeAll(() => {
                 ChildProcess.exec.mockImplementation((command, callback) => callback(null, JSON.stringify(fakeConfig)));
-                spyOn(JSON, 'parse').and.throwError(fakeError);
+                jest.spyOn(JSON, 'parse').mockImplementation(() => {
+                    throw fakeError;
+                });
             });
 
             it('should reject with the error', () => {
@@ -91,8 +93,8 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                ChildProcess.exec.restore();
-                JSON.parse.restore();
+                ChildProcess.exec.mockRestore();
+                JSON.parse.mockRestore();
             });
 
         });
@@ -113,7 +115,7 @@ describe('FunctionsConfig', () => {
             });
 
             it('should execute with correct command', () => {
-                expect(ChildProcess.exec).toBeCalledWith(`firebase functions:config:set ${name}=${value}`, expect.anything());
+                expect(ChildProcess.exec).toHaveBeenCalledWith(`firebase functions:config:set ${name}=${value}`, expect.anything());
             });
 
             it('should return value', () => {
@@ -121,7 +123,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                ChildProcess.exec.restore();
+                ChildProcess.exec.mockRestore();
             });
 
         });
@@ -138,7 +140,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                ChildProcess.exec.restore();
+                ChildProcess.exec.mockRestore();
             });
 
         });
@@ -158,7 +160,7 @@ describe('FunctionsConfig', () => {
             });
 
             it('should execute with correct command', () => {
-                expect(ChildProcess.exec).toBeCalledWith(`firebase functions:config:unset ${name}`, expect.anything());
+                expect(ChildProcess.exec).toHaveBeenCalledWith(`firebase functions:config:unset ${name}`, expect.anything());
             });
 
             it('should return value', () => {
@@ -166,7 +168,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                ChildProcess.exec.restore();
+                ChildProcess.exec.mockRestore();
             });
 
         });
@@ -183,7 +185,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                ChildProcess.exec.restore();
+                ChildProcess.exec.mockRestore();
             });
 
         });
@@ -204,7 +206,7 @@ describe('FunctionsConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
+                jest.spyOn(FunctionsConfig, 'get').mockResolvedValue(config);
                 result = await FunctionsConfig.getNamesById(group, id);
             });
 
@@ -217,7 +219,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                FunctionsConfig.get.restore();
+                FunctionsConfig.get.mockRestore();
             });
 
         });
@@ -226,7 +228,7 @@ describe('FunctionsConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(FunctionsConfig, 'get');
+                jest.spyOn(FunctionsConfig, 'get');
                 result = await FunctionsConfig.getNamesById(group, id, config);
             });
 
@@ -239,7 +241,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                FunctionsConfig.get.restore();
+                FunctionsConfig.get.mockRestore();
             });
 
         });
@@ -248,7 +250,7 @@ describe('FunctionsConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(FunctionsConfig, 'get');
+                jest.spyOn(FunctionsConfig, 'get');
                 result = await FunctionsConfig.getNamesById(group, 'some-unknown-id', config);
             });
 
@@ -261,7 +263,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                FunctionsConfig.get.restore();
+                FunctionsConfig.get.mockRestore();
             });
 
         });
@@ -270,7 +272,7 @@ describe('FunctionsConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
+                jest.spyOn(FunctionsConfig, 'get').mockResolvedValue(config);
                 result = await FunctionsConfig.getNamesById('unknown-group', 'some-unknown-id', config);
             });
 
@@ -283,7 +285,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                FunctionsConfig.get.restore();
+                FunctionsConfig.get.mockRestore();
             });
 
         });
@@ -304,7 +306,7 @@ describe('FunctionsConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
+                jest.spyOn(FunctionsConfig, 'get').mockResolvedValue(config);
                 result = await FunctionsConfig.getIdByName(group, name);
             });
 
@@ -317,7 +319,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                FunctionsConfig.get.restore();
+                FunctionsConfig.get.mockRestore();
             });
 
         });
@@ -326,7 +328,7 @@ describe('FunctionsConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(FunctionsConfig, 'get');
+                jest.spyOn(FunctionsConfig, 'get');
                 result = await FunctionsConfig.getIdByName(group, name, config);
             });
 
@@ -339,7 +341,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                FunctionsConfig.get.restore();
+                FunctionsConfig.get.mockRestore();
             });
 
         });
@@ -348,7 +350,7 @@ describe('FunctionsConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(FunctionsConfig, 'get');
+                jest.spyOn(FunctionsConfig, 'get');
                 result = await FunctionsConfig.getIdByName(group, 'some-unknown-name', config);
             });
 
@@ -361,7 +363,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                FunctionsConfig.get.restore();
+                FunctionsConfig.get.mockRestore();
             });
 
         });
@@ -370,7 +372,7 @@ describe('FunctionsConfig', () => {
             let result;
 
             beforeAll(async () => {
-                spyOn(FunctionsConfig, 'get').and.returnValue(Promise.resolve(config));
+                jest.spyOn(FunctionsConfig, 'get').mockResolvedValue(config);
                 result = await FunctionsConfig.getIdByName('unknown-group', name, config);
             });
 
@@ -383,7 +385,7 @@ describe('FunctionsConfig', () => {
             });
 
             afterAll(() => {
-                FunctionsConfig.get.restore();
+                FunctionsConfig.get.mockRestore();
             });
 
         });

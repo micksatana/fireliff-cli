@@ -8,7 +8,7 @@ describe('RichMenuRequest', () => {
         let accessToken = 'someaccesstoken';
 
         beforeAll(() => {
-            spyOn(Axios, 'create').and.callThrough();
+            jest.spyOn(Axios, 'create');
             req = new RichMenuRequest({ accessToken });
         });
 
@@ -17,7 +17,7 @@ describe('RichMenuRequest', () => {
         });
 
         it('should create axios instance with correct headers for LINE API', () => {
-            expect(Axios.create).toBeCalledWith({
+            expect(Axios.create).toHaveBeenCalledWith({
                 headers: {
                     'authorization': `Bearer ${accessToken}`,
                     'content-type': 'application/json'
@@ -27,7 +27,7 @@ describe('RichMenuRequest', () => {
         });
 
         afterAll(() => {
-            Axios.create.restore();
+            Axios.create.mockRestore();
         });
 
     });

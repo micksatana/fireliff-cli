@@ -8,7 +8,7 @@ describe('LIFFDeleteRequest', () => {
         let accessToken = 'someaccesstoken';
 
         beforeAll(() => {
-            spyOn(Axios, 'create').and.callThrough();
+            jest.spyOn(Axios, 'create');
             req = new LIFFDeleteRequest({ accessToken });
         });
 
@@ -17,7 +17,7 @@ describe('LIFFDeleteRequest', () => {
         });
 
         it('should create axios instance with correct headers for LINE API', () => {
-            expect(Axios.create).toBeCalledWith({
+            expect(Axios.create).toHaveBeenCalledWith({
                 headers: {
                     'authorization': `Bearer ${accessToken}`,
                     'content-type': 'application/json'
@@ -29,20 +29,20 @@ describe('LIFFDeleteRequest', () => {
         describe('when send liffId', () => {
             let liffId = 'shkf2h39fwef';
             beforeAll(() => {
-                spyOn(req.axios, 'delete').and.returnValue(Promise.resolve('any'));
+                jest.spyOn(req.axios, 'delete').mockResolvedValue('any');
                 req.send(liffId);
             });
             it('should call to correct endpoint', () => {
                 expect(req.axios.delete).toHaveBeenCalledTimes(1);
-                expect(req.axios.delete).toBeCalledWith(`${req.endpoint}/${liffId}`);
+                expect(req.axios.delete).toHaveBeenCalledWith(`${req.endpoint}/${liffId}`);
             });
             afterAll(() => {
-                req.axios.delete.restore();
+                req.axios.delete.mockRestore();
             });
         });
 
         afterAll(() => {
-            Axios.create.restore();
+            Axios.create.mockRestore();
         });
 
     });

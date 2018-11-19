@@ -8,7 +8,7 @@ describe('LIFFGetRequest', () => {
         let accessToken = 'someaccesstoken';
 
         beforeAll(() => {
-            spyOn(Axios, 'create').and.callThrough();
+            jest.spyOn(Axios, 'create');
             req = new LIFFGetRequest({ accessToken });
         });
 
@@ -17,7 +17,7 @@ describe('LIFFGetRequest', () => {
         });
 
         it('should create axios instance with correct headers for LINE API', () => {
-            expect(Axios.create).toBeCalledWith({
+            expect(Axios.create).toHaveBeenCalledWith({
                 headers: {
                     'authorization': `Bearer ${accessToken}`,
                     'content-type': 'application/json'
@@ -28,20 +28,20 @@ describe('LIFFGetRequest', () => {
 
         describe('when send a request', () => {
             beforeAll(() => {
-                spyOn(req.axios, 'get').and.returnValue(Promise.resolve('any'));
+                jest.spyOn(req.axios, 'get').mockResolvedValue('any');
                 req.send();
             });
             it('should call to correct endpoint', () => {
                 expect(req.axios.get).toHaveBeenCalledTimes(1);
-                expect(req.axios.get).toBeCalledWith(req.endpoint);
+                expect(req.axios.get).toHaveBeenCalledWith(req.endpoint);
             });
             afterAll(() => {
-                req.axios.get.restore();
+                req.axios.get.mockRestore();
             });
         });
 
         afterAll(() => {
-            Axios.create.restore();
+            Axios.create.mockRestore();
         });
 
     });

@@ -11,7 +11,7 @@ describe('RichMenuUploadRequest', () => {
         let accessToken = 'someaccesstoken';
 
         beforeAll(() => {
-            spyOn(Axios, 'create').and.callThrough();
+            jest.spyOn(Axios, 'create');
             req = new RichMenuUploadRequest({ accessToken });
         });
 
@@ -20,7 +20,7 @@ describe('RichMenuUploadRequest', () => {
         });
 
         it('should create axios instance with correct headers for LINE API', () => {
-            expect(Axios.create).toBeCalledWith({
+            expect(Axios.create).toHaveBeenCalledWith({
                 headers: {
                     'authorization': `Bearer ${accessToken}`,
                     'content-type': 'image/jpeg'
@@ -40,7 +40,7 @@ describe('RichMenuUploadRequest', () => {
                 beforeAll(() => {
                     fs.createReadStream.mockImplementation(() => fakeStream);
                     fs.stat.mockImplementation((path, callback) => callback(null, fakeStat));
-                    spyOn(req.axios, 'post').and.returnValue(Promise.resolve('any'));
+                    jest.spyOn(req.axios, 'post').mockResolvedValue('any');
                     req.send(richMenuId, imagePath);
                 });
 
@@ -49,19 +49,19 @@ describe('RichMenuUploadRequest', () => {
                 });
 
                 it('should get file stat', () => {
-                    expect(fs.stat).toBeCalledWith(imagePath, expect.anything());
+                    expect(fs.stat).toHaveBeenCalledWith(imagePath, expect.anything());
                 });
 
                 it('should send read stream', () => {
-                    expect(fs.createReadStream).toBeCalledWith(imagePath);
+                    expect(fs.createReadStream).toHaveBeenCalledWith(imagePath);
                     expect(req.axios.post).toHaveBeenCalledTimes(1);
-                    expect(req.axios.post).toBeCalledWith(`${req.endpoint}/${richMenuId}/content`, fakeStream);
+                    expect(req.axios.post).toHaveBeenCalledWith(`${req.endpoint}/${richMenuId}/content`, fakeStream);
                 });
 
                 afterAll(() => {
-                    fs.createReadStream.restore();
-                    fs.stat.restore();
-                    req.axios.post.restore();
+                    fs.createReadStream.mockRestore();
+                    fs.stat.mockRestore();
+                    req.axios.post.mockRestore();
                 });
 
             });
@@ -72,7 +72,7 @@ describe('RichMenuUploadRequest', () => {
                 beforeAll(() => {
                     fs.createReadStream.mockImplementation(() => fakeStream);
                     fs.stat.mockImplementation((path, callback) => callback(expectedError, null));
-                    spyOn(req.axios, 'post').and.returnValue(Promise.resolve('any'));
+                    jest.spyOn(req.axios, 'post').mockResolvedValue('any');
                 });
 
                 it('should reject with the error', () => {
@@ -80,9 +80,9 @@ describe('RichMenuUploadRequest', () => {
                 });
 
                 afterAll(() => {
-                    fs.createReadStream.restore();
-                    fs.stat.restore();
-                    req.axios.post.restore();
+                    fs.createReadStream.mockRestore();
+                    fs.stat.mockRestore();
+                    req.axios.post.mockRestore();
                 });
 
             });
@@ -91,7 +91,7 @@ describe('RichMenuUploadRequest', () => {
         });
 
         afterAll(() => {
-            Axios.create.restore();
+            Axios.create.mockRestore();
         });
 
     });
