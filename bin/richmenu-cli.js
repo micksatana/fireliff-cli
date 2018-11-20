@@ -17,8 +17,6 @@ var _index = require("./index");
 
 var _shared = require("./shared");
 
-var _richMenuSetDefaultRequest = require("./rich-menu-set-default-request.js");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
@@ -67,6 +65,9 @@ const options = commandLineArgs([{
   name: 'url',
   type: String
 }, {
+  name: 'user',
+  type: String
+}, {
   name: 'version',
   alias: 'v',
   type: Boolean
@@ -77,7 +78,7 @@ const options = commandLineArgs([{
   argv
 }); // Commands that need Functions config
 
-if (['add', 'delete', 'get', 'default'].indexOf(operation) > -1) {
+if (['add', 'delete', 'get', 'default', 'link'].indexOf(operation) > -1) {
   (0, _shared.getValidatedConfig)().then(async config => {
     let accessToken = config.line.access_token;
     let names;
@@ -241,7 +242,7 @@ if (['add', 'delete', 'get', 'default'].indexOf(operation) > -1) {
 
       case 'default':
         // Set menu as default for all users
-        req = new _richMenuSetDefaultRequest.RichMenuSetDefaultRequest({
+        req = new _index.RichMenuSetDefaultRequest({
           accessToken
         });
 
@@ -275,6 +276,51 @@ if (['add', 'delete', 'get', 'default'].indexOf(operation) > -1) {
             }
           } else {
             console.log(`Failed to set RichMenu ${options.id.input} as default`.error);
+            console.error(error);
+            process.exit(1);
+          }
+        }
+
+        break;
+
+      case 'link':
+        // Link a rich menu to an individual user
+        req = new _index.RichMenuLinkUserRequest({
+          accessToken
+        });
+
+        if (!options.id && !options.name || !options.user) {
+          console.warn(`Command ${'richmenu link'.prompt} required RichMenu ID or name option, and user option`.warn);
+          console.log(`Try re-run ${'richmenu link --id <richMenuId> --user <userId>'.input} OR  ${'richmenu link --name <richMenuName> --user <userId>'.input}`.help);
+          process.exit(1);
+        }
+
+        if (options.name) {
+          options.id = await _index.LIFFConfig.getRichMenuIdByName(options.name, config);
+
+          if (typeof options.id !== 'string') {
+            console.error(`Failed to retrieve RichMenu ID using RichMenu name ${options.name.input}`.error);
+            process.exit(1);
+          }
+
+          console.log('options.id', options.id);
+        }
+
+        try {
+          console.log(`Sending request to link RichMenu ${options.id.input} to User ${options.user}`.verbose);
+          res = await req.send(options.id, options.user);
+          console.log(`Linked RichMenu ID ${options.id.input} to User ${options.user.input}`.verbose);
+        } catch (error) {
+          if (error.response && error.response.data) {
+            if (error.response.data.message) {
+              console.log(error.response.data.message.info);
+            } else {
+              console.log(`Failed to link RichMenu ${options.id.input} to User ${options.user.input}`.error);
+              console.error(error.response.data.error);
+              process.exit(1);
+            }
+          } else {
+            console.log(`Failed to link RichMenu ${options.id.input} to User ${options.user.input}`.error);
             console.error(error);
             process.exit(1);
           }

@@ -78,7 +78,8 @@ To add a new RichMenu
 ```
 richmenu add --name <richMenuName> --data <dataFile> --image <imageFile>
 ```
-IMPORTANT NOTE: The richmenu naming cannot be uppercase due to Firebase Functions Configuration specification. It's recommended to use `rich-menu-name` pattern.
+#### IMPORTANT NOTE
+The richmenu naming cannot be uppercase due to Firebase Functions Configuration specification. It's recommended to use `rich-menu-name` pattern.
 
 ### Update RichMenu
 LINE Rich Menu API currently not support `PUT` method which means you cannot update the rich menu. The workaround is add new menu and delete the old one.
@@ -108,10 +109,23 @@ Set RichMenu for all users using RichMenu ID
 ```
 richmenu default --id <richMenuId>
 ```
-Set RichMenu for all users using RichMenu name. Please note this RichMenu name is the name when you add the RichMenu with `--name` option which will be saved in Firebase Functions Configuration. It is not the same as a `name` property in data file. You can run `richmenu get` to see RichMenu name in the first column.
+Set RichMenu for all users using RichMenu name
 ```
 richmenu default --name <richMenuName>
 ```
+
+### Link a RichMenu to an individual user
+Link RichMenu to an individual user using RichMenu ID
+```
+richmenu default --id <richMenuId> --user <userId>
+```
+Link RichMenu to an individual user using RichMenu name
+```
+richmenu default --name <richMenuName> --user <userId>
+```
+
+#### IMPORTANT NOTE
+The RichMenu name is the name when you add the RichMenu with `--name` option which will be saved in Firebase Functions Configuration. It is not the same as a `name` property in data file. You can run `richmenu get` to see RichMenu name in the first column.
 
 ## Develop LIFF Web Views
 ### Performance consideration
