@@ -117,12 +117,17 @@ richmenu default --name <richMenuName>
 ### Link a RichMenu to an individual user
 Link RichMenu to an individual user using RichMenu ID
 ```
-richmenu default --id <richMenuId> --user <userId>
+richmenu link --id <richMenuId> --user <userId>
 ```
 Link RichMenu to an individual user using RichMenu name
 ```
-richmenu default --name <richMenuName> --user <userId>
+richmenu link --name <richMenuName> --user <userId>
 ```
+
+### Unlink RichMenu from an individual user
+Unlink RichMenu from an individual user
+```
+richmenu unlink --user <userId>
 
 #### IMPORTANT NOTE
 The RichMenu name is the name when you add the RichMenu with `--name` option which will be saved in Firebase Functions Configuration. It is not the same as a `name` property in data file. You can run `richmenu get` to see RichMenu name in the first column.

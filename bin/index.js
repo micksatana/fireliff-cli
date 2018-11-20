@@ -81,6 +81,12 @@ Object.defineProperty(exports, "RichMenuSetDefaultRequest", {
     return _richMenuSetDefaultRequest.RichMenuSetDefaultRequest;
   }
 });
+Object.defineProperty(exports, "RichMenuUnlinkUserRequest", {
+  enumerable: true,
+  get: function () {
+    return _richMenuUnlinkUserRequest.RichMenuUnlinkUserRequest;
+  }
+});
 Object.defineProperty(exports, "RichMenuUploadRequest", {
   enumerable: true,
   get: function () {
@@ -113,6 +119,8 @@ var _richMenuLinkUserRequest = require("./rich-menu-link-user-request");
 var _richMenuRequest = require("./rich-menu-request");
 
 var _richMenuSetDefaultRequest = require("./rich-menu-set-default-request");
+
+var _richMenuUnlinkUserRequest = require("./rich-menu-unlink-user-request");
 
 var _richMenuUploadRequest = require("./rich-menu-upload-request");
 //# sourceMappingURL=index.js.map
