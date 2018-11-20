@@ -78,7 +78,7 @@ const options = commandLineArgs([{
   argv
 }); // Commands that need Functions config
 
-if (['add', 'delete', 'get', 'default', 'link'].indexOf(operation) > -1) {
+if (['add', 'delete', 'get', 'default', 'link', 'unlink'].indexOf(operation) > -1) {
   (0, _shared.getValidatedConfig)().then(async config => {
     let accessToken = config.line.access_token;
     let names;
@@ -302,8 +302,6 @@ if (['add', 'delete', 'get', 'default', 'link'].indexOf(operation) > -1) {
             console.error(`Failed to retrieve RichMenu ID using RichMenu name ${options.name.input}`.error);
             process.exit(1);
           }
-
-          console.log('options.id', options.id);
         }
 
         try {
@@ -321,6 +319,39 @@ if (['add', 'delete', 'get', 'default', 'link'].indexOf(operation) > -1) {
             }
           } else {
             console.log(`Failed to link RichMenu ${options.id.input} to User ${options.user.input}`.error);
+            console.error(error);
+            process.exit(1);
+          }
+        }
+
+        break;
+
+      case 'unlink':
+        req = new _index.RichMenuUnlinkUserRequest({
+          accessToken
+        });
+
+        if (!options.user) {
+          console.warn(`Command ${'richmenu unlink'.prompt} required user option`.warn);
+          console.log(`Try re-run ${'richmenu unlink --user <userId>'.input}`.help);
+          process.exit(1);
+        }
+
+        try {
+          console.log(`Sending request to unlink RichMenu from User ${options.user}`.verbose);
+          res = await req.send(options.user);
+          console.log(`Unlinked RichMenu from User ${options.user.input}`.verbose);
+        } catch (error) {
+          if (error.response && error.response.data) {
+            if (error.response.data.message) {
+              console.log(error.response.data.message.info);
+            } else {
+              console.log(`Failed to unlink RichMenu from User ${options.user.input}`.error);
+              console.error(error.response.data.error);
+              process.exit(1);
+            }
+          } else {
+            console.log(`Failed to unlink RichMenu from User ${options.user.input}`.error);
             console.error(error);
             process.exit(1);
           }
