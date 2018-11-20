@@ -27,7 +27,7 @@ describe('RichMenuLinkUserRequest', () => {
         });
 
         describe('when send richMenuId', () => {
-            let userId = 'Uajsodfhwh'
+            let userId = 'Uajsodfhwh';
             let richMenuId = 'asffleifjsd';
             beforeAll(() => {
                 jest.spyOn(req.axios, 'post').mockResolvedValue('any');
