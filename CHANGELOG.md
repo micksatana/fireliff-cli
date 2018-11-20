@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2018-11-20
+### Added
+ - `richmenu default` to set default RichMenu for all users
+ - `richmenu link` to link RichMenu to an individual user
+ - `richmenu unlink` to unlink RichMenu from an individual user
+
 ## [1.2.0] - 2018-10-26
 ### Added
  - `fliff init`
