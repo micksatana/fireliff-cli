@@ -63,10 +63,22 @@ Object.defineProperty(exports, "RichMenuGetRequest", {
     return _richMenuGetRequest.RichMenuGetRequest;
   }
 });
+Object.defineProperty(exports, "RichMenuLinkUserRequest", {
+  enumerable: true,
+  get: function () {
+    return _richMenuLinkUserRequest.RichMenuLinkUserRequest;
+  }
+});
 Object.defineProperty(exports, "RichMenuRequest", {
   enumerable: true,
   get: function () {
     return _richMenuRequest.RichMenuRequest;
+  }
+});
+Object.defineProperty(exports, "RichMenuSetDefaultRequest", {
+  enumerable: true,
+  get: function () {
+    return _richMenuSetDefaultRequest.RichMenuSetDefaultRequest;
   }
 });
 Object.defineProperty(exports, "RichMenuUploadRequest", {
@@ -96,7 +108,11 @@ var _richMenuDeleteRequest = require("./rich-menu-delete-request");
 
 var _richMenuGetRequest = require("./rich-menu-get-request");
 
+var _richMenuLinkUserRequest = require("./rich-menu-link-user-request");
+
 var _richMenuRequest = require("./rich-menu-request");
+
+var _richMenuSetDefaultRequest = require("./rich-menu-set-default-request");
 
 var _richMenuUploadRequest = require("./rich-menu-upload-request");
 //# sourceMappingURL=index.js.map
