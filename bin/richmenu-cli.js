@@ -17,6 +17,8 @@ var _index = require("./index");
 
 var _shared = require("./shared");
 
+var _richMenuSetDefaultRequest = require("./rich-menu-set-default-request.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
@@ -75,7 +77,7 @@ const options = commandLineArgs([{
   argv
 }); // Commands that need Functions config
 
-if (['add', 'delete', 'get'].indexOf(operation) > -1) {
+if (['add', 'delete', 'get', 'default'].indexOf(operation) > -1) {
   (0, _shared.getValidatedConfig)().then(async config => {
     let accessToken = config.line.access_token;
     let names;
@@ -233,6 +235,49 @@ if (['add', 'delete', 'get'].indexOf(operation) > -1) {
               'No. of Areas': menu.areas.length
             };
           }));
+        }
+
+        break;
+
+      case 'default':
+        // Set menu as default for all users
+        req = new _richMenuSetDefaultRequest.RichMenuSetDefaultRequest({
+          accessToken
+        });
+
+        if (!options.id && !options.name) {
+          console.warn(`Command ${'richmenu default'.prompt} required RichMenu ID or name option`.warn);
+          console.log(`Try re-run ${'richmenu default --id <richMenuId>'.input} OR  ${'richmenu default --name <richMenuName>'.input}`.help);
+          process.exit(1);
+        }
+
+        if (options.name) {
+          options.id = await _index.LIFFConfig.getRichMenuIdByName(options.name, config);
+
+          if (typeof options.id !== 'string') {
+            console.error(`Failed to retrieve RichMenu ID using RichMenu name ${options.name.input}`.error);
+            process.exit(1);
+          }
+        }
+
+        try {
+          console.log(`Sending request to set RichMenu ${options.id.input} as default`.verbose);
+          res = await req.send(options.id);
+          console.log(`Set default RichMenu ID: ${options.id.input}`.verbose);
+        } catch (error) {
+          if (error.response && error.response.data) {
+            if (error.response.data.message) {
+              console.log(error.response.data.message.info);
+            } else {
+              console.log(`Failed to set RichMenu ${options.id.input} as default`.error);
+              console.error(error.response.data.error);
+              process.exit(1);
+            }
+          } else {
+            console.log(`Failed to set RichMenu ${options.id.input} as default`.error);
+            console.error(error);
+            process.exit(1);
+          }
         }
 
         break;
