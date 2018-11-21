@@ -128,7 +128,7 @@ richmenu link --name <richMenuName> --user <userId>
 Unlink RichMenu from an individual user
 ```
 richmenu unlink --user <userId>
-
+```
 #### IMPORTANT NOTE
 The RichMenu name is the name when you add the RichMenu with `--name` option which will be saved in Firebase Functions Configuration. It is not the same as a `name` property in data file. You can run `richmenu get` to see RichMenu name in the first column.
 
