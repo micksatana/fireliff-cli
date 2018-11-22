@@ -5,15 +5,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.FLIFF = void 0;
 
+var _child_process = require("child_process");
+
 var colors = _interopRequireWildcard(require("colors"));
 
 var _fs = require("fs");
+
+var _os = require("os");
 
 var path = _interopRequireWildcard(require("path"));
 
 var prompt = _interopRequireWildcard(require("prompt"));
 
-var _child_process = require("child_process");
+var _functionsConfig = require("./functions-config");
+
+var _liffConfig = require("./liff-config");
+
+var _liffUpdateRequest = require("./liff-update-request");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -31,8 +39,19 @@ colors.setTheme({
   code: 'blue',
   error: 'red'
 });
+const failedToRetrieveIdUsingName = `Failed to retrieve LIFF ID using view name`.error;
+const failedToRetrieveNameUsingId = `Failed to retrieve view name using LIFF ID`.error;
+const updateRequiredIdOrName = `Command ${'fliff update'.prompt} required LIFF ID or name option`.warn + _os.EOL + `\r\nTry re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help;
 
 class FLIFF {
+  static get errorMessages() {
+    return {
+      failedToRetrieveIdUsingName,
+      failedToRetrieveNameUsingId,
+      updateRequiredIdOrName
+    };
+  }
+
   static init(initPath) {
     const fbjsonPath = path.resolve(initPath, '../firebase.json');
     const distPath = `${path.basename(initPath)}/dist`;
@@ -100,6 +119,67 @@ class FLIFF {
         });
       });
     });
+  }
+
+  constructor() {}
+
+  async update(options) {
+    const req = new _liffUpdateRequest.LIFFUpdateRequest({
+      accessToken: _functionsConfig.FunctionsConfig.AccessToken
+    });
+    let data = {};
+
+    if (!options.id && !options.name) {
+      return Promise.reject(FLIFF.errorMessages.updateRequiredIdOrName);
+    }
+
+    if (!options.id) {
+      options.id = await _liffConfig.LIFFConfig.getViewIdByName(options.name, _functionsConfig.FunctionsConfig.config);
+
+      if (typeof options.id !== 'string') {
+        return Promise.reject(FLIFF.errorMessages.failedToRetrieveIdUsingName);
+      }
+    }
+
+    if (!options.name) {
+      options.name = await _liffConfig.LIFFConfig.getViewNameById(options.id, _functionsConfig.FunctionsConfig.config);
+
+      if (typeof options.name !== 'string') {
+        return Promise.reject(FLIFF.errorMessages.failedToRetrieveNameUsingId);
+      }
+    }
+
+    if (options.type || options.url) {
+      data.view = {};
+
+      if (options.type) {
+        data.view.type = options.type;
+      }
+
+      if (options.url) {
+        data.view.url = options.url;
+      }
+    }
+
+    if (options.description) {
+      data.description = options.description;
+    }
+
+    if (options.ble) {
+      data.features = {
+        ble: options.ble.toLowerCase() == 'false' ? false : true
+      };
+    }
+
+    try {
+      return await req.send(options.id, data);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        return Promise.reject(error.response.data.message.error);
+      } else {
+        return Promise.reject(error);
+      }
+    }
   }
 
 }

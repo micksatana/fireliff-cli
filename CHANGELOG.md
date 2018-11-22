@@ -1,4 +1,7 @@
 # Changelog
+## [1.4.0]
+ - `fliff update` can update partially
+ - `fliff update` can update `features.ble` and `description`
 
 ## [1.3.0] - 2018-11-20
 ### Added
