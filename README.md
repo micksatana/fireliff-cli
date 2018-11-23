@@ -25,11 +25,26 @@ Install FireLIFF CLI
 ```
 npm i -g @intocode-io/fireliff-cli
 ```
-Set LINE channel access token
+### Configure LINE channel access token
+There are two approaches to set LINE channel access token
+#### A) Use long-lived access token
+This approach is quick and easy but less secure because the token we are using here is long-lived access token. You can manually issue this token using [LINE Developers Console](https://developers.line.biz/console).
 ```
-firebase functions:config:set line.access_token=<channelAccessToken>
+fliff config --token <accessToken>
 ```
-Set Firebase Hosting URL
+#### B) Use short-lived access token
+This approach is recommended. First setup your channel id and secret. They can be found in [LINE Developers Console](https://developers.line.biz/console).
+```
+fliff config --id <channelId> --secret <channelSecret>
+```
+After channel ID and secret are configured. Issue a channel access token and save it.
+```
+fliff token --issue --save
+```
+##### IMPORTANT NOTE
+Short-lived access token is valid for 30 days. You should have a process to replace the access token periodically.
+
+### Set Firebase Hosting URL
 ```
 firebase functions:config:set hosting.url=<hostingUrl>
 ```

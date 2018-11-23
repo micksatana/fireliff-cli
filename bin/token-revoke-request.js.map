@@ -1,0 +1,1 @@
+{"version":3,"sources":["../lib/token-revoke-request.js"],"names":["TokenRevokeRequest"],"mappings":";;;;;;;AAAO,MAAMA,kBAAN,CAAyB","sourcesContent":["export class TokenRevokeRequest {\n    \n}"],"file":"token-revoke-request.js"}

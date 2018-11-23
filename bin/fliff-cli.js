@@ -41,7 +41,16 @@ const options = commandLineArgs([{
   name: 'id',
   type: String
 }, {
+  name: 'issue',
+  type: String
+}, {
   name: 'name',
+  type: String
+}, {
+  name: 'revoke',
+  type: String
+}, {
+  name: 'secret',
   type: String
 }, {
   name: 'type',
@@ -55,12 +64,12 @@ const options = commandLineArgs([{
   type: Boolean
 }], {
   argv
-}); // Commands that need Functions config
+});
+const fliff = new _fliff.FLIFF(); // Commands that need Functions config
 
-if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
+if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
   (0, _shared.getValidatedConfig)().then(async config => {
     const accessToken = config.line.access_token;
-    const fliff = new _fliff.FLIFF();
     let viewNames;
     let data;
     let req;
@@ -193,10 +202,10 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
       case 'update':
         console.log(`Sending request to update LIFF view`.verbose);
         fliff.update(options).then(rsUpdate => {
-          console.log(`Updated LIFF ID: ${options.id.input}`.verbose);
+          console.log(`Updated LIFF ID: ${options.id.input}`.info);
           return rsUpdate;
         }).catch(errUpdate => {
-          console.log(errUpdate);
+          console.log(errUpdate.message || errUpdate);
           process.exit(1);
         });
         break;
@@ -213,6 +222,19 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
 
     case 'version':
       console.log(`Version: ${_package.default.version}`);
+      break;
+
+    case 'config':
+      console.log(`Configuring Firebase Functions`.verbose);
+      fliff.config(options).then(rsConfig => {
+        console.log(`The following property has been updated.`.info);
+        console.log(JSON.stringify(rsConfig, undefined, 2));
+        console.log(`Firebase Functions configured`.info);
+        return rsConfig;
+      }).catch(errConfig => {
+        console.log(errConfig.message || errConfig);
+        process.exit(1);
+      });
       break;
 
     case 'help':

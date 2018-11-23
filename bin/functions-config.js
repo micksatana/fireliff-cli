@@ -11,9 +11,9 @@ var _os = require("os");
 
 require("./colors-set-theme");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+var _functionsConfigError = require("./functions-config-error");
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 const FailedToGetConfig = 'Failed to get configuration'.error;
 const FailedToGetConfigAuthError = [FailedToGetConfig, 'Suggestions:'.info, 'Your credentials are no longer valid. Please run firebase login --reauth'.verbose].join(_os.EOL);
@@ -23,8 +23,27 @@ const FailedToGetConfigUnknownError = [FailedToGetConfig, 'Suggestions:'.info, `
  */
 
 class FunctionsConfig {
+  //
+  // Read-only
+  //
+  static get AccessToken() {
+    return FunctionsConfig.config[FunctionsConfig.SingleChannelGroup][FunctionsConfig.AccessTokenName];
+  }
+
+  static get AccessTokenName() {
+    return 'access_token';
+  }
+
   static get BaseCommand() {
     return 'firebase functions:config';
+  }
+
+  static get ChannelIdName() {
+    return 'channel_id';
+  }
+
+  static get ChannelSecretName() {
+    return 'channel_secret';
   }
 
   static get ErrorMessages() {
@@ -35,9 +54,12 @@ class FunctionsConfig {
     };
   }
 
-  static get AccessToken() {
-    return FunctionsConfig.config[FunctionsConfig.SingleChannelGroup][FunctionsConfig.AccessTokenName];
-  }
+  static get SingleChannelGroup() {
+    return 'line';
+  } //
+  // Methods
+  //
+
 
   static async get(name) {
     return new Promise((resolve, reject) => {
@@ -61,6 +83,38 @@ class FunctionsConfig {
       });
     });
   }
+  /**
+   * Find value (id) of a property in a group
+   * 
+   * @param {string} group 
+   * @param {string} name 
+   * @param {*} config 
+   */
+
+
+  static async getIdByName(group, name, config) {
+    if (!config || !config[group]) {
+      config = await FunctionsConfig.get();
+    }
+
+    if (config && config[group]) {
+      for (let prop in config[group]) {
+        if (prop === name) {
+          return config[group][prop];
+        }
+      }
+    }
+
+    return null;
+  }
+  /**
+   * Find properties in a group which their value matched id
+   * 
+   * @param {string} group 
+   * @param {string} id 
+   * @param {*} config 
+   */
+
 
   static async getNamesById(group, id, config) {
     const names = [];
@@ -79,26 +133,6 @@ class FunctionsConfig {
 
     return names;
   }
-
-  static async getIdByName(group, name, config) {
-    if (!config || !config[group]) {
-      config = await FunctionsConfig.get();
-    }
-
-    if (config && config[group]) {
-      for (let prop in config[group]) {
-        if (prop === name) {
-          return config[group][prop];
-        }
-      }
-    }
-
-    return null;
-  }
-
-  static parseName(name) {
-    return name.toLowerCase().replace(/\s/g, '_');
-  }
   /**
    * 
    * @param {Error|string} error 
@@ -110,10 +144,30 @@ class FunctionsConfig {
     let errorMessage = error instanceof Error ? error.message : error;
 
     if (/Authentication Error/.test(errorMessage)) {
-      return FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError;
+      return new _functionsConfigError.FunctionsConfigError(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError);
     } else {
-      return FunctionsConfig.ErrorMessages.FailedToGetConfigUnknownError;
+      return new _functionsConfigError.FunctionsConfigError(FunctionsConfig.ErrorMessages.FailedToGetConfigUnknownError);
     }
+  }
+  /**
+   * 
+   * @param {string} name
+   * @return {string} name in Firebase Functions Config acceptable format 
+   */
+
+
+  static parseName(name) {
+    return name.toLowerCase().replace(/\s/g, '_');
+  }
+  /**
+   * Load configuration and set into config
+   * 
+   * @return {Promise} config 
+   */
+
+
+  static reload() {
+    return FunctionsConfig.get().then(config => FunctionsConfig.config = config);
   }
 
   static async set(name, value) {
@@ -126,10 +180,6 @@ class FunctionsConfig {
         return resolve(value);
       });
     });
-  }
-
-  static reload() {
-    return FunctionsConfig.get().then(config => FunctionsConfig.config = config);
   }
 
   static async unset(name) {
@@ -147,8 +197,4 @@ class FunctionsConfig {
 }
 
 exports.FunctionsConfig = FunctionsConfig;
-
-_defineProperty(FunctionsConfig, "AccessTokenName", 'access_token');
-
-_defineProperty(FunctionsConfig, "SingleChannelGroup", 'line');
 //# sourceMappingURL=functions-config.js.map

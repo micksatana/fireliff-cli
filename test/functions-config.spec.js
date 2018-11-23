@@ -1,5 +1,6 @@
 import * as ChildProcess from 'child_process';
 import { FunctionsConfig } from '../lib/functions-config';
+import { FunctionsConfigError } from '../lib/functions-config-error';
 
 jest.mock('child_process');
 
@@ -11,6 +12,14 @@ describe('FunctionsConfig', () => {
 
     it('has correct BaseCommand', () => {
         expect(FunctionsConfig.BaseCommand).toEqual('firebase functions:config');
+    });
+
+    it('has correct ChannelIdName', () => {
+        expect(FunctionsConfig.ChannelIdName).toEqual('channel_id');
+    });
+
+    it('has correct ChannelSecretName', () => {
+        expect(FunctionsConfig.ChannelSecretName).toEqual('channel_secret');
     });
 
     it('has correct SingleChannelGroup', () => {
@@ -442,7 +451,7 @@ describe('FunctionsConfig', () => {
             const fakeError = new Error('Something Authentication Error blah blah');
 
             it('able to parse Authentication Error', () => {
-                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError);
+                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(new FunctionsConfigError(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError));
             });
 
         });
@@ -451,7 +460,7 @@ describe('FunctionsConfig', () => {
             const fakeError = 'Something Authentication Error blah blah';
 
             it('able to parse Authentication Error', () => {
-                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError);
+                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(new FunctionsConfigError(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError));
             });
 
         });
@@ -459,7 +468,7 @@ describe('FunctionsConfig', () => {
         describe('when receive unknown error', () => {
 
             it('return unknown error', () => {
-                expect(FunctionsConfig.parseGetConfigError('something else')).toEqual(FunctionsConfig.ErrorMessages.FailedToGetConfigUnknownError);
+                expect(FunctionsConfig.parseGetConfigError('something else')).toEqual(new FunctionsConfigError(FunctionsConfig.ErrorMessages.FailedToGetConfigUnknownError));
             });
 
         });
