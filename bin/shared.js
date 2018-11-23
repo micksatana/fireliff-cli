@@ -10,7 +10,7 @@ var _functionsConfig = require("./functions-config");
 async function getValidatedConfig() {
   try {
     console.log('Get Firebase Functions configuration'.verbose);
-    let config = await _functionsConfig.FunctionsConfig.get();
+    let config = await _functionsConfig.FunctionsConfig.reload();
 
     if (!config.line || !config.line.access_token) {
       console.log('Functions configuration not found: line.access_token'.help);
@@ -21,10 +21,7 @@ async function getValidatedConfig() {
 
     return config;
   } catch (error) {
-    console.log('Failed to get configuration'.error);
-    console.log('Suggestions:'.info);
-    console.log(`Run ${'firebase init'.code} to start a project directory in the current folder.`.verbose);
-    console.log(`Run ${'firebase use --add'.code} to set active project.`.verbose);
+    console.log(error);
     process.exit(1);
   }
 }

@@ -5,6 +5,24 @@ jest.mock('child_process');
 
 describe('FunctionsConfig', () => {
 
+    it('has correct AccessTokenName', () => {
+        expect(FunctionsConfig.AccessTokenName).toEqual('access_token');
+    });
+
+    it('has correct BaseCommand', () => {
+        expect(FunctionsConfig.BaseCommand).toEqual('firebase functions:config');
+    });
+
+    it('has correct SingleChannelGroup', () => {
+        expect(FunctionsConfig.SingleChannelGroup).toEqual('line');
+    });
+
+    it('has correct AccessToken', () => {
+        FunctionsConfig.config = { line: { access_token: 'test' } };
+        expect(FunctionsConfig.AccessToken).toEqual(FunctionsConfig.config.line.access_token);
+        delete FunctionsConfig.config;
+    });
+
     describe('when get configurations', () => {
         let fakeConfig = {
             hosting: {
@@ -66,6 +84,7 @@ describe('FunctionsConfig', () => {
 
             beforeAll(() => {
                 ChildProcess.exec.mockImplementation((command, callback) => callback(fakeError, JSON.stringify(fakeConfig)));
+                jest.spyOn(FunctionsConfig, 'parseGetConfigError').mockImplementation(x => x);
             });
 
             it('should reject with the error', () => {
@@ -74,6 +93,7 @@ describe('FunctionsConfig', () => {
 
             afterAll(() => {
                 ChildProcess.exec.mockRestore();
+                FunctionsConfig.parseGetConfigError.mockRestore();
             });
 
         });
@@ -388,6 +408,72 @@ describe('FunctionsConfig', () => {
                 FunctionsConfig.get.mockRestore();
             });
 
+        });
+
+    });
+
+    describe('reload', () => {
+        const fakeConfig = 'Some fake config';
+        let rsReload;
+
+        beforeAll(async () => {
+            jest.spyOn(FunctionsConfig, 'get').mockResolvedValue(fakeConfig);
+            rsReload = await FunctionsConfig.reload();
+        });
+
+        it('return config', () => {
+            expect(rsReload).toEqual(fakeConfig);
+        });
+
+        it('set singleton config property', () => {
+            expect(FunctionsConfig.config).toEqual(fakeConfig);
+        });
+
+        afterAll(() => {
+            delete FunctionsConfig.config;
+            FunctionsConfig.get.mockRestore();
+        });
+
+    });
+
+    describe('parseGetConfigError', () => {
+
+        describe('when receive string', () => {
+            const fakeError = new Error('Something Authentication Error blah blah');
+
+            it('able to parse Authentication Error', () => {
+                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError);
+            });
+
+        });
+
+        describe('when receive error', () => {
+            const fakeError = 'Something Authentication Error blah blah';
+
+            it('able to parse Authentication Error', () => {
+                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError);
+            });
+
+        });
+
+        describe('when receive unknown error', () => {
+
+            it('return unknown error', () => {
+                expect(FunctionsConfig.parseGetConfigError('something else')).toEqual(FunctionsConfig.ErrorMessages.FailedToGetConfigUnknownError);
+            });
+
+        });
+
+    });
+
+    describe('parseName', () => {
+
+        it('handle uppercase', () => {
+            expect(FunctionsConfig.parseName('LOWERCASE')).toEqual('lowercase');
+        });
+
+        it('handle space', () => {
+            expect(FunctionsConfig.parseName('    ')).toEqual('____');
         });
 
     });
