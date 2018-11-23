@@ -57,6 +57,13 @@ Update using view name
 ```
 fliff update --name <viewName> --type <viewType> --url <viewUrl>
 ```
+To update Bluetooth® Low Energy (BLE) flag, use `--ble` option
+```
+fliff update --id <liffId> --ble <true|false>
+```
+
+#### IMPORTANT NOTE
+The Name column in LIFF tab in LINE developers Console is not related to `fliff update --name` option here. According to LINE LIFF API specification, this Name of the LIFF app column is actually `description` in its request body. So If you would like to change this value you can run `fliff update --id <viewId> --description <descripton>`
 
 ### Delete LIFF view
 Update using LIFF ID

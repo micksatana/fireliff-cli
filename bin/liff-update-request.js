@@ -13,7 +13,7 @@ class LIFFUpdateRequest extends _liffRequest.LIFFRequest {
   }
 
   send(liffId, data) {
-    return this.axios.put(`https://api.line.me/liff/v1/apps/${liffId}/view`, JSON.stringify(data));
+    return this.axios.put(`${this.endpoint}/${liffId}`, JSON.stringify(data));
   }
 
 }

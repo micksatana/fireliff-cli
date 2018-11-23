@@ -42,7 +42,7 @@ describe('LIFFUpdateRequest', () => {
 
             it('should call to correct endpoint', () => {
                 expect(req.axios.put).toHaveBeenCalledTimes(1);
-                expect(req.axios.put).toHaveBeenCalledWith(`${req.endpoint}/${liffId}/view`, JSON.stringify(data));
+                expect(req.axios.put).toHaveBeenCalledWith(`${req.endpoint}/${liffId}`, JSON.stringify(data));
             });
 
             afterAll(() => {

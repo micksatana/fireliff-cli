@@ -9,9 +9,11 @@ var _package = _interopRequireDefault(require("../package.json"));
 
 var _ = require(".");
 
-var _shared = require("./shared");
+require("./colors-set-theme");
 
 var _fliff = require("./fliff.js");
+
+var _shared = require("./shared");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -30,6 +32,12 @@ const {
 });
 const argv = _unknown || [];
 const options = commandLineArgs([{
+  name: 'ble',
+  type: String
+}, {
+  name: 'description',
+  type: String
+}, {
   name: 'id',
   type: String
 }, {
@@ -51,7 +59,8 @@ const options = commandLineArgs([{
 
 if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
   (0, _shared.getValidatedConfig)().then(async config => {
-    let accessToken = config.line.access_token;
+    const accessToken = config.line.access_token;
+    const fliff = new _fliff.FLIFF();
     let viewNames;
     let data;
     let req;
@@ -182,61 +191,14 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
         break;
 
       case 'update':
-        req = new _.LIFFUpdateRequest({
-          accessToken
+        console.log(`Sending request to update LIFF view`.verbose);
+        fliff.update(options).then(rsUpdate => {
+          console.log(`Updated LIFF ID: ${options.id.input}`.verbose);
+          return rsUpdate;
+        }).catch(errUpdate => {
+          console.log(errUpdate);
+          process.exit(1);
         });
-
-        if (!options.id && !options.name) {
-          console.warn(`Command ${'fliff update'.prompt} required LIFF ID or name option`.warn);
-          console.log(`Try re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help);
-          process.exit(1);
-        }
-
-        if (!options.id) {
-          options.id = await _.LIFFConfig.getViewIdByName(options.name, config);
-
-          if (typeof options.id !== 'string') {
-            console.error(`Failed to retrieve LIFF ID with view name ${options.name.input}`.error);
-            process.exit(1);
-          }
-        }
-
-        if (!options.name) {
-          options.name = await _.LIFFConfig.getViewNameById(options.id, config);
-
-          if (typeof options.name !== 'string') {
-            console.error(`Failed to retrieve view name with LIFF ID ${options.id.input}`.error);
-            process.exit(1);
-          }
-        }
-
-        if (!options.type || !options.url) {
-          console.warn(`Command ${'fliff update'.prompt} required both LIFF type AND url options to be updated`.warn);
-          console.log(`Try re-run with options ${'--type <type> --url <url>'.input}`.help);
-          process.exit(1);
-        }
-
-        data = {
-          type: options.type,
-          url: options.url
-        };
-
-        try {
-          console.log(`Sending request to update LIFF view ${options.id.input}`.verbose);
-          res = await req.send(options.id, data);
-          console.log(`Updated view with LIFF ID: ${options.id.input}`.verbose);
-        } catch (error) {
-          console.log(`Failed to update LIFF view ${options.id.input}`.error);
-
-          if (error.response && error.response.data && error.response.data.message) {
-            console.log(error.response.data.message.error, data);
-          } else {
-            console.error(error);
-          }
-
-          process.exit(1);
-        }
-
         break;
 
       default:
