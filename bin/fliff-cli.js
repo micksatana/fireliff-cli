@@ -42,13 +42,16 @@ const options = commandLineArgs([{
   type: String
 }, {
   name: 'issue',
-  type: String
+  type: Boolean
 }, {
   name: 'name',
   type: String
 }, {
   name: 'revoke',
   type: String
+}, {
+  name: 'save',
+  type: Boolean
 }, {
   name: 'secret',
   type: String
@@ -205,7 +208,40 @@ if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
           console.log(`Updated LIFF ID: ${options.id.input}`.info);
           return rsUpdate;
         }).catch(errUpdate => {
-          console.log(errUpdate.message || errUpdate);
+          const message = errUpdate.message || errUpdate;
+          console.log(message.error);
+          process.exit(1);
+        });
+        break;
+
+      case 'token':
+        if (options.issue === true) {
+          console.log('Issuing channel access token'.verbose);
+        } else if (options.revoke !== undefined) {
+          console.log('Revoking channel access token'.verbose);
+        }
+
+        fliff.token(options).then(rsToken => {
+          if (options.issue === true && rsToken.accessToken) {
+            console.log(`The following token has been issued.`.info);
+            console.log(JSON.stringify(rsToken, undefined, 2));
+
+            if (options.save === true) {
+              console.log(`The access token is saved on Firebase Functions Configuration.`.info);
+            } else {
+              console.log(`This access token is NOT saved on Firebase Functions Configuration.`.warn);
+              console.log(`If you would like to saved on Firebase Functions Configuration. Try re-run using ${'fliff token --issue --save'.input} `.help);
+            }
+          } else if (options.revoke !== undefined && rsToken === true) {
+            console.log(`The token is revoked.`.info);
+          } else {
+            console.log('Unknown response').warn;
+          }
+
+          return rsToken;
+        }).catch(errToken => {
+          const message = errToken.message || errToken;
+          console.log(message.error);
           process.exit(1);
         });
         break;
@@ -232,7 +268,8 @@ if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
         console.log(`Firebase Functions configured`.info);
         return rsConfig;
       }).catch(errConfig => {
-        console.log(errConfig.message || errConfig);
+        const message = errConfig.message || errConfig;
+        console.log(message.error);
         process.exit(1);
       });
       break;

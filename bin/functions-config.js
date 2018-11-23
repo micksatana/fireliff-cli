@@ -38,6 +38,14 @@ class FunctionsConfig {
     return 'firebase functions:config';
   }
 
+  static get ChannelId() {
+    return FunctionsConfig.config[FunctionsConfig.SingleChannelGroup][FunctionsConfig.ChannelIdName];
+  }
+
+  static get ChannelSecret() {
+    return FunctionsConfig.config[FunctionsConfig.SingleChannelGroup][FunctionsConfig.ChannelSecretName];
+  }
+
   static get ChannelIdName() {
     return 'channel_id';
   }

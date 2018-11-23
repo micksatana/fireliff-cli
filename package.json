@@ -39,6 +39,7 @@
     "command-line-args": "^5.0.2",
     "console.table": "^0.10.0",
     "prompt": "^1.0.0",
+    "qs": "^6.5.2",
     "recursive-copy": "^2.0.9"
   },
   "devDependencies": {

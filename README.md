@@ -6,6 +6,7 @@
 Command line interface for building LIFF app on Firebase. This module will help you handle API to add, update, delete, get LIFF apps and set LIFF IDs in Firebase Functions configuration which can be retrieved in your Functions project.
 
 ## Prerequisite
+
 ### Firebase Tools
 Firebase tools must be installed
 ```
@@ -25,13 +26,16 @@ Install FireLIFF CLI
 ```
 npm i -g @intocode-io/fireliff-cli
 ```
+
 ### Configure LINE channel access token
 There are two approaches to set LINE channel access token
+
 #### A) Use long-lived access token
 This approach is quick and easy but less secure because the token we are using here is long-lived access token. You can manually issue this token using [LINE Developers Console](https://developers.line.biz/console).
 ```
 fliff config --token <accessToken>
 ```
+
 #### B) Use short-lived access token
 This approach is recommended. First setup your channel id and secret. They can be found in [LINE Developers Console](https://developers.line.biz/console).
 ```
@@ -41,6 +45,11 @@ After channel ID and secret are configured. Issue a channel access token and sav
 ```
 fliff token --issue --save
 ```
+In case you want to revoke an access token, you can run with `--revoke` option.
+```
+fliff token --revoke <accessToken>
+```
+
 ##### IMPORTANT NOTE
 Short-lived access token is valid for 30 days. You should have a process to replace the access token periodically.
 
@@ -151,6 +160,7 @@ Unlink RichMenu from an individual user
 ```
 richmenu unlink --user <userId>
 ```
+
 #### IMPORTANT NOTE
 The RichMenu name is the name when you add the RichMenu with `--name` option which will be saved in Firebase Functions Configuration. It is not the same as a `name` property in data file. You can run `richmenu get` to see RichMenu name in the first column.
 
@@ -163,11 +173,13 @@ web-views/src/some-view.js
 web-views/src/some-view.css
 ```
 It's recommended to load only neccessary library in the html file; for example, the LIFF SDK. And use Parcel Bundler to import other libraries as needed. Parcel Bundler will help to several things; including Tree-shaking which will reduce JavaScript payloads.
+
 ### Environment file naming
 The boilerplate has two environments; `production` and `staging`. But you can create more if needed. Environment file uses the following format
 ```
 web-views/.env.{process.NODE_ENV}
 ```
+
 ### Environment and Firebase project alias
 Environment must be aligned with Firebase project alias. Run `firebase use` to see all aliases. If you don't have `staging` and `production` aliases, you can add them by run the following command.
 ```

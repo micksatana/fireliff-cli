@@ -6,6 +6,20 @@ jest.mock('child_process');
 
 describe('FunctionsConfig', () => {
 
+    beforeAll(() => {
+        FunctionsConfig.config = {
+            line: {
+                channel_id: 'testChannelId',
+                channel_secret: 'testChannelSecret',
+                access_token: 'testAccessToken'
+            }
+        };
+    });
+
+    afterAll(() => {
+        delete FunctionsConfig.config;
+    });
+
     it('has correct AccessTokenName', () => {
         expect(FunctionsConfig.AccessTokenName).toEqual('access_token');
     });
@@ -27,9 +41,15 @@ describe('FunctionsConfig', () => {
     });
 
     it('has correct AccessToken', () => {
-        FunctionsConfig.config = { line: { access_token: 'test' } };
         expect(FunctionsConfig.AccessToken).toEqual(FunctionsConfig.config.line.access_token);
-        delete FunctionsConfig.config;
+    });
+
+    it('has correct ChannelId', () => {
+        expect(FunctionsConfig.ChannelId).toEqual(FunctionsConfig.config.line.channel_id);
+    });
+
+    it('has correct ChannelSecret', () => {
+        expect(FunctionsConfig.ChannelSecret).toEqual(FunctionsConfig.config.line.channel_secret);
     });
 
     describe('when get configurations', () => {

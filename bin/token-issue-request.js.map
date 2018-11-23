@@ -1,1 +1,0 @@
-{"version":3,"sources":["../lib/token-issue-request.js"],"names":["TokenIssueRequest"],"mappings":";;;;;;;AAAO,MAAMA,iBAAN,CAAwB","sourcesContent":["export class TokenIssueRequest {\n    \n}"],"file":"token-issue-request.js"}
