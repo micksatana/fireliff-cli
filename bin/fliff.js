@@ -17,25 +17,39 @@ var prompt = _interopRequireWildcard(require("prompt"));
 
 require("./colors-set-theme");
 
+var _fliffError = require("./fliff-error");
+
 var _functionsConfig = require("./functions-config");
 
 var _liffConfig = require("./liff-config");
 
 var _liffUpdateRequest = require("./liff-update-request");
 
+var _oauthIssueTokenRequest = require("./oauth-issue-token-request");
+
+var _oauthRevokeTokenRequest = require("./oauth-revoke-token-request");
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 const copy = require('recursive-copy');
 
+const ConfigRequiredIdSecretOrName = `Failed to configure channel. ${'fliff config'.prompt} required id, secret or token options.`.error + _os.EOL + `Try re-run with option ${'--id <channelId>'.input} OR ${'--secret <channelSecret>'.input} OR ${'--token <channelToken>'.input}`.help;
 const FailedToRetrieveIdUsingName = `Failed to retrieve LIFF ID using view name`.error;
 const FailedToRetrieveNameUsingId = `Failed to retrieve view name using LIFF ID`.error;
-const UpdateRequiredIdOrName = `Command ${'fliff update'.prompt} required LIFF ID or name option`.warn + _os.EOL + `\r\nTry re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help;
+const RevokeTokenRequiredAccessToken = `Command ${'fliff token --revoke'.prompt} required access token.`.warn + _os.EOL + `Try re-run with access token ${'fliff token --revoke <accessToken>'.input}`.help;
+const IssueTokenRequiredChannelIdAndSecret = `Command ${'fliff token'.prompt} required Channel ID and Secret to be configured first`.error + _os.EOL + `Try run ${'fliff config --id <channelId> --secret <channelSecret>'.input} to configure before re-run ${'fliff token'.prompt} again.`.help;
+const TokenRequiredIssueOrRevoke = `Command ${'fliff token'.prompt} required issue or revoke options.`.error + _os.EOL + `Try re-run with option ${'--issue'.input} OR ${'--revoke'.input}`.help;
+const UpdateRequiredIdOrName = `Command ${'fliff update'.prompt} required LIFF ID or name option`.warn + _os.EOL + `Try re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help;
 
 class FLIFF {
   static get ErrorMessages() {
     return {
+      ConfigRequiredIdSecretOrName,
       FailedToRetrieveIdUsingName,
       FailedToRetrieveNameUsingId,
+      RevokeTokenRequiredAccessToken,
+      IssueTokenRequiredChannelIdAndSecret,
+      TokenRequiredIssueOrRevoke,
       UpdateRequiredIdOrName
     };
   }
@@ -111,6 +125,100 @@ class FLIFF {
 
   constructor() {}
 
+  async config(options) {
+    let result = {};
+
+    if (!options.id && !options.secret && !options.token) {
+      return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.ConfigRequiredIdSecretOrName));
+    } else {
+      result[_functionsConfig.FunctionsConfig.SingleChannelGroup] = {};
+    }
+
+    if (options.id) {
+      try {
+        await _functionsConfig.FunctionsConfig.set(`${_functionsConfig.FunctionsConfig.SingleChannelGroup}.${_functionsConfig.FunctionsConfig.ChannelIdName}`, options.id);
+        result[_functionsConfig.FunctionsConfig.SingleChannelGroup][_functionsConfig.FunctionsConfig.ChannelIdName] = options.id;
+      } catch (errId) {
+        return Promise.reject(errId);
+      }
+    }
+
+    if (options.secret) {
+      try {
+        await _functionsConfig.FunctionsConfig.set(`${_functionsConfig.FunctionsConfig.SingleChannelGroup}.${_functionsConfig.FunctionsConfig.ChannelSecretName}`, options.secret);
+        result[_functionsConfig.FunctionsConfig.SingleChannelGroup][_functionsConfig.FunctionsConfig.ChannelSecretName] = options.secret;
+      } catch (errSecret) {
+        return Promise.reject(errSecret);
+      }
+    }
+
+    if (options.token) {
+      try {
+        await _functionsConfig.FunctionsConfig.set(`${_functionsConfig.FunctionsConfig.SingleChannelGroup}.${_functionsConfig.FunctionsConfig.AccessTokenName}`, options.token);
+        result[_functionsConfig.FunctionsConfig.SingleChannelGroup][_functionsConfig.FunctionsConfig.AccessTokenName] = options.token;
+      } catch (errToken) {
+        return Promise.reject(errToken);
+      }
+    }
+
+    return result;
+  }
+
+  async token(options) {
+    if (!options.issue && options.revoke === undefined) {
+      return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.TokenRequiredIssueOrRevoke));
+    }
+
+    if (options.issue === true) {
+      if (!_functionsConfig.FunctionsConfig.ChannelId && !_functionsConfig.FunctionsConfig.ChannelSecret) {
+        return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.IssueTokenRequiredChannelIdAndSecret));
+      }
+
+      try {
+        const req = new _oauthIssueTokenRequest.OAuthIssueTokenRequest();
+        const res = await req.send(_functionsConfig.FunctionsConfig.ChannelId, _functionsConfig.FunctionsConfig.ChannelSecret);
+        const tokenData = res.status === 200 ? {
+          accessToken: res.data.access_token,
+          expiresIn: res.data.expires_in,
+          type: res.data.token_type
+        } : false;
+
+        if (tokenData) {
+          if (options.save === true) {
+            await _functionsConfig.FunctionsConfig.set(`${_functionsConfig.FunctionsConfig.SingleChannelGroup}.${_functionsConfig.FunctionsConfig.AccessTokenName}`, tokenData.accessToken);
+            return tokenData;
+          }
+        } else {
+          return Promise.reject(new _fliffError.FLIFFError(res.statusText));
+        }
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.error_description) {
+          return Promise.reject(error.response.data.error_description);
+        } else {
+          return Promise.reject(error);
+        }
+      }
+    } else if (options.revoke !== undefined) {
+      if (options.revoke === null) {
+        return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.RevokeTokenRequiredAccessToken));
+      }
+
+      try {
+        const req = new _oauthRevokeTokenRequest.OAuthRevokeTokenRequest();
+        const res = await req.send(options.revoke);
+        return res.status === 200 ? true : Promise.reject(new _fliffError.FLIFFError(res.statusText));
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.error_description) {
+          return Promise.reject(error.response.data.error_description);
+        } else {
+          return Promise.reject(error);
+        }
+      }
+    }
+
+    return;
+  }
+
   async update(options) {
     const req = new _liffUpdateRequest.LIFFUpdateRequest({
       accessToken: _functionsConfig.FunctionsConfig.AccessToken
@@ -118,14 +226,14 @@ class FLIFF {
     let data = {};
 
     if (!options.id && !options.name) {
-      return Promise.reject(FLIFF.ErrorMessages.UpdateRequiredIdOrName);
+      return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.UpdateRequiredIdOrName));
     }
 
     if (!options.id) {
       options.id = await _liffConfig.LIFFConfig.getViewIdByName(options.name, _functionsConfig.FunctionsConfig.config);
 
       if (typeof options.id !== 'string') {
-        return Promise.reject(FLIFF.ErrorMessages.FailedToRetrieveIdUsingName);
+        return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.FailedToRetrieveIdUsingName));
       }
     }
 
@@ -133,7 +241,7 @@ class FLIFF {
       options.name = await _liffConfig.LIFFConfig.getViewNameById(options.id, _functionsConfig.FunctionsConfig.config);
 
       if (typeof options.name !== 'string') {
-        return Promise.reject(FLIFF.ErrorMessages.FailedToRetrieveNameUsingId);
+        return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.FailedToRetrieveNameUsingId));
       }
     }
 

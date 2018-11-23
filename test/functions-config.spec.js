@@ -1,9 +1,24 @@
 import * as ChildProcess from 'child_process';
 import { FunctionsConfig } from '../lib/functions-config';
+import { FunctionsConfigError } from '../lib/functions-config-error';
 
 jest.mock('child_process');
 
 describe('FunctionsConfig', () => {
+
+    beforeAll(() => {
+        FunctionsConfig.config = {
+            line: {
+                channel_id: 'testChannelId',
+                channel_secret: 'testChannelSecret',
+                access_token: 'testAccessToken'
+            }
+        };
+    });
+
+    afterAll(() => {
+        delete FunctionsConfig.config;
+    });
 
     it('has correct AccessTokenName', () => {
         expect(FunctionsConfig.AccessTokenName).toEqual('access_token');
@@ -13,14 +28,28 @@ describe('FunctionsConfig', () => {
         expect(FunctionsConfig.BaseCommand).toEqual('firebase functions:config');
     });
 
+    it('has correct ChannelIdName', () => {
+        expect(FunctionsConfig.ChannelIdName).toEqual('channel_id');
+    });
+
+    it('has correct ChannelSecretName', () => {
+        expect(FunctionsConfig.ChannelSecretName).toEqual('channel_secret');
+    });
+
     it('has correct SingleChannelGroup', () => {
         expect(FunctionsConfig.SingleChannelGroup).toEqual('line');
     });
 
     it('has correct AccessToken', () => {
-        FunctionsConfig.config = { line: { access_token: 'test' } };
         expect(FunctionsConfig.AccessToken).toEqual(FunctionsConfig.config.line.access_token);
-        delete FunctionsConfig.config;
+    });
+
+    it('has correct ChannelId', () => {
+        expect(FunctionsConfig.ChannelId).toEqual(FunctionsConfig.config.line.channel_id);
+    });
+
+    it('has correct ChannelSecret', () => {
+        expect(FunctionsConfig.ChannelSecret).toEqual(FunctionsConfig.config.line.channel_secret);
     });
 
     describe('when get configurations', () => {
@@ -442,7 +471,7 @@ describe('FunctionsConfig', () => {
             const fakeError = new Error('Something Authentication Error blah blah');
 
             it('able to parse Authentication Error', () => {
-                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError);
+                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(new FunctionsConfigError(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError));
             });
 
         });
@@ -451,7 +480,7 @@ describe('FunctionsConfig', () => {
             const fakeError = 'Something Authentication Error blah blah';
 
             it('able to parse Authentication Error', () => {
-                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError);
+                expect(FunctionsConfig.parseGetConfigError(fakeError)).toEqual(new FunctionsConfigError(FunctionsConfig.ErrorMessages.FailedToGetConfigAuthError));
             });
 
         });
@@ -459,7 +488,7 @@ describe('FunctionsConfig', () => {
         describe('when receive unknown error', () => {
 
             it('return unknown error', () => {
-                expect(FunctionsConfig.parseGetConfigError('something else')).toEqual(FunctionsConfig.ErrorMessages.FailedToGetConfigUnknownError);
+                expect(FunctionsConfig.parseGetConfigError('something else')).toEqual(new FunctionsConfigError(FunctionsConfig.ErrorMessages.FailedToGetConfigUnknownError));
             });
 
         });

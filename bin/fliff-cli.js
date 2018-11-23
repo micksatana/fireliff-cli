@@ -41,7 +41,19 @@ const options = commandLineArgs([{
   name: 'id',
   type: String
 }, {
+  name: 'issue',
+  type: Boolean
+}, {
   name: 'name',
+  type: String
+}, {
+  name: 'revoke',
+  type: String
+}, {
+  name: 'save',
+  type: Boolean
+}, {
+  name: 'secret',
   type: String
 }, {
   name: 'type',
@@ -55,12 +67,12 @@ const options = commandLineArgs([{
   type: Boolean
 }], {
   argv
-}); // Commands that need Functions config
+});
+const fliff = new _fliff.FLIFF(); // Commands that need Functions config
 
-if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
+if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
   (0, _shared.getValidatedConfig)().then(async config => {
     const accessToken = config.line.access_token;
-    const fliff = new _fliff.FLIFF();
     let viewNames;
     let data;
     let req;
@@ -193,10 +205,43 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
       case 'update':
         console.log(`Sending request to update LIFF view`.verbose);
         fliff.update(options).then(rsUpdate => {
-          console.log(`Updated LIFF ID: ${options.id.input}`.verbose);
+          console.log(`Updated LIFF ID: ${options.id.input}`.info);
           return rsUpdate;
         }).catch(errUpdate => {
-          console.log(errUpdate);
+          const message = errUpdate.message || errUpdate;
+          console.log(message.error);
+          process.exit(1);
+        });
+        break;
+
+      case 'token':
+        if (options.issue === true) {
+          console.log('Issuing channel access token'.verbose);
+        } else if (options.revoke !== undefined) {
+          console.log('Revoking channel access token'.verbose);
+        }
+
+        fliff.token(options).then(rsToken => {
+          if (options.issue === true && rsToken.accessToken) {
+            console.log(`The following token has been issued.`.info);
+            console.log(JSON.stringify(rsToken, undefined, 2));
+
+            if (options.save === true) {
+              console.log(`The access token is saved on Firebase Functions Configuration.`.info);
+            } else {
+              console.log(`This access token is NOT saved on Firebase Functions Configuration.`.warn);
+              console.log(`If you would like to saved on Firebase Functions Configuration. Try re-run using ${'fliff token --issue --save'.input} `.help);
+            }
+          } else if (options.revoke !== undefined && rsToken === true) {
+            console.log(`The token is revoked.`.info);
+          } else {
+            console.log('Unknown response').warn;
+          }
+
+          return rsToken;
+        }).catch(errToken => {
+          const message = errToken.message || errToken;
+          console.log(message.error);
           process.exit(1);
         });
         break;
@@ -213,6 +258,20 @@ if (['add', 'update', 'delete', 'get'].indexOf(operation) > -1) {
 
     case 'version':
       console.log(`Version: ${_package.default.version}`);
+      break;
+
+    case 'config':
+      console.log(`Configuring Firebase Functions`.verbose);
+      fliff.config(options).then(rsConfig => {
+        console.log(`The following property has been updated.`.info);
+        console.log(JSON.stringify(rsConfig, undefined, 2));
+        console.log(`Firebase Functions configured`.info);
+        return rsConfig;
+      }).catch(errConfig => {
+        const message = errConfig.message || errConfig;
+        console.log(message.error);
+        process.exit(1);
+      });
       break;
 
     case 'help':
