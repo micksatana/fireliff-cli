@@ -7,8 +7,6 @@ exports.FLIFF = void 0;
 
 var _child_process = require("child_process");
 
-var colors = _interopRequireWildcard(require("colors"));
-
 var _fs = require("fs");
 
 var _os = require("os");
@@ -16,6 +14,8 @@ var _os = require("os");
 var path = _interopRequireWildcard(require("path"));
 
 var prompt = _interopRequireWildcard(require("prompt"));
+
+require("./colors-set-theme");
 
 var _functionsConfig = require("./functions-config");
 
@@ -27,28 +27,16 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 const copy = require('recursive-copy');
 
-colors.setTheme({
-  silly: 'rainbow',
-  input: 'grey',
-  verbose: 'cyan',
-  prompt: 'grey',
-  info: 'green',
-  data: 'white',
-  help: 'cyan',
-  warn: 'yellow',
-  code: 'blue',
-  error: 'red'
-});
-const failedToRetrieveIdUsingName = `Failed to retrieve LIFF ID using view name`.error;
-const failedToRetrieveNameUsingId = `Failed to retrieve view name using LIFF ID`.error;
-const updateRequiredIdOrName = `Command ${'fliff update'.prompt} required LIFF ID or name option`.warn + _os.EOL + `\r\nTry re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help;
+const FailedToRetrieveIdUsingName = `Failed to retrieve LIFF ID using view name`.error;
+const FailedToRetrieveNameUsingId = `Failed to retrieve view name using LIFF ID`.error;
+const UpdateRequiredIdOrName = `Command ${'fliff update'.prompt} required LIFF ID or name option`.warn + _os.EOL + `\r\nTry re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help;
 
 class FLIFF {
-  static get errorMessages() {
+  static get ErrorMessages() {
     return {
-      failedToRetrieveIdUsingName,
-      failedToRetrieveNameUsingId,
-      updateRequiredIdOrName
+      FailedToRetrieveIdUsingName,
+      FailedToRetrieveNameUsingId,
+      UpdateRequiredIdOrName
     };
   }
 
@@ -130,14 +118,14 @@ class FLIFF {
     let data = {};
 
     if (!options.id && !options.name) {
-      return Promise.reject(FLIFF.errorMessages.updateRequiredIdOrName);
+      return Promise.reject(FLIFF.ErrorMessages.UpdateRequiredIdOrName);
     }
 
     if (!options.id) {
       options.id = await _liffConfig.LIFFConfig.getViewIdByName(options.name, _functionsConfig.FunctionsConfig.config);
 
       if (typeof options.id !== 'string') {
-        return Promise.reject(FLIFF.errorMessages.failedToRetrieveIdUsingName);
+        return Promise.reject(FLIFF.ErrorMessages.FailedToRetrieveIdUsingName);
       }
     }
 
@@ -145,7 +133,7 @@ class FLIFF {
       options.name = await _liffConfig.LIFFConfig.getViewNameById(options.id, _functionsConfig.FunctionsConfig.config);
 
       if (typeof options.name !== 'string') {
-        return Promise.reject(FLIFF.errorMessages.failedToRetrieveNameUsingId);
+        return Promise.reject(FLIFF.ErrorMessages.FailedToRetrieveNameUsingId);
       }
     }
 

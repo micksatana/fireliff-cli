@@ -9,9 +9,11 @@ var _package = _interopRequireDefault(require("../package.json"));
 
 var _ = require(".");
 
-var _shared = require("./shared");
+require("./colors-set-theme");
 
 var _fliff = require("./fliff.js");
+
+var _shared = require("./shared");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
