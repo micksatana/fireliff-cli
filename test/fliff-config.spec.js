@@ -4,21 +4,17 @@ import { FunctionsConfig } from '../lib/functions-config';
 
 describe('fliff config', () => {
 
-    beforeAll(() => {
-        jest.spyOn(FunctionsConfig, 'set').mockResolvedValue(true);
-    });
-
-    afterAll(() => {
-        FunctionsConfig.set.mockRestore();
-    });
-
     describe('when no options provided', () => {
         const options = {};
         let fliff;
 
         beforeAll(() => {
+            jest.spyOn(FunctionsConfig, 'set').mockResolvedValue(true);
             fliff = new FLIFF();
-            FunctionsConfig.set.mockReset();
+        });
+
+        afterAll(() => {
+            FunctionsConfig.set.mockRestore();
         });
 
         it('reject with error', async () => {
@@ -35,45 +31,132 @@ describe('fliff config', () => {
         const options = {
             id: 'testId'
         };
-        let fliff;
 
-        beforeAll(() => {
-            fliff = new FLIFF();
+        describe('and able to set config', () => {
+            let fliff;
+
+            beforeAll(() => {
+                jest.spyOn(FunctionsConfig, 'set').mockResolvedValue(true);
+                fliff = new FLIFF();
+            });
+
+            afterAll(() => {
+                FunctionsConfig.set.mockRestore();
+            });
+
+            it('resolves correctly', async () => {
+                await expect(fliff.config(options)).resolves.toEqual({ line: { channel_id: options.id } });
+            });
+
         });
 
-        it('resolves correctly', async () => {
-            await expect(fliff.config(options)).resolves.toEqual({ line: { channel_id: options.id } });
+        describe('and failed to set config', () => {
+            const fakeError = new Error('some error');
+            let fliff;
+
+            beforeAll(() => {
+                jest.spyOn(FunctionsConfig, 'set').mockRejectedValue(fakeError);
+                fliff = new FLIFF();
+            });
+
+            afterAll(() => {
+                FunctionsConfig.set.mockRestore();
+            });
+
+            it('reject with error', async () => {
+                await expect(fliff.config(options)).rejects.toEqual(fakeError);
+            });
+
         });
+
     });
 
     describe('when options.secret is provided', () => {
         const options = {
             secret: 'testSecret'
         };
-        let fliff;
 
-        beforeAll(() => {
-            fliff = new FLIFF();
+        describe('and able to set config', () => {
+            let fliff;
+
+            beforeAll(() => {
+                jest.spyOn(FunctionsConfig, 'set').mockResolvedValue(true);
+                fliff = new FLIFF();
+            });
+
+            afterAll(() => {
+                FunctionsConfig.set.mockRestore();
+            });
+
+            it('resolves correctly', async () => {
+                await expect(fliff.config(options)).resolves.toEqual({ line: { channel_secret: options.secret } });
+            });
+
         });
 
-        it('resolves correctly', async () => {
-            await expect(fliff.config(options)).resolves.toEqual({ line: { channel_secret: options.secret } });
+        describe('and failed to set config', () => {
+            const fakeError = new Error('some error');
+            let fliff;
+
+            beforeAll(() => {
+                jest.spyOn(FunctionsConfig, 'set').mockRejectedValue(fakeError);
+                fliff = new FLIFF();
+            });
+
+            afterAll(() => {
+                FunctionsConfig.set.mockRestore();
+            });
+
+            it('reject with error', async () => {
+                await expect(fliff.config(options)).rejects.toEqual(fakeError);
+            });
+
         });
+
     });
 
     describe('when options.token is provided', () => {
         const options = {
             token: 'testToken'
         };
-        let fliff;
 
-        beforeAll(() => {
-            fliff = new FLIFF();
+        describe('and able to set config', () => {
+            let fliff;
+
+            beforeAll(() => {
+                jest.spyOn(FunctionsConfig, 'set').mockResolvedValue(true);
+                fliff = new FLIFF();
+            });
+
+            afterAll(() => {
+                FunctionsConfig.set.mockRestore();
+            });
+
+            it('resolves correctly', async () => {
+                await expect(fliff.config(options)).resolves.toEqual({ line: { access_token: options.token } });
+            });
+
         });
 
-        it('resolves correctly', async () => {
-            await expect(fliff.config(options)).resolves.toEqual({ line: { access_token: options.token } });
+        describe('and failed to set config', () => {
+            const fakeError = new Error('some error');
+            let fliff;
+
+            beforeAll(() => {
+                jest.spyOn(FunctionsConfig, 'set').mockRejectedValue(fakeError);
+                fliff = new FLIFF();
+            });
+
+            afterAll(() => {
+                FunctionsConfig.set.mockRestore();
+            });
+
+            it('reject with error', async () => {
+                await expect(fliff.config(options)).rejects.toEqual(fakeError);
+            });
+
         });
+
     });
 
 });
