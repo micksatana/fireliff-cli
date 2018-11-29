@@ -45,6 +45,18 @@ Object.defineProperty(exports, "LIFFRequest", {
     return _liffRequest.LIFFRequest;
   }
 });
+Object.defineProperty(exports, "OAuthIssueTokenRequest", {
+  enumerable: true,
+  get: function () {
+    return _oauthIssueTokenRequest.OAuthIssueTokenRequest;
+  }
+});
+Object.defineProperty(exports, "OAuthRevokeTokenRequest", {
+  enumerable: true,
+  get: function () {
+    return _oauthRevokeTokenRequest.OAuthRevokeTokenRequest;
+  }
+});
 Object.defineProperty(exports, "RichMenuAddRequest", {
   enumerable: true,
   get: function () {
@@ -107,6 +119,10 @@ var _liffGetRequest = require("./liff-get-request");
 var _liffUpdateRequest = require("./liff-update-request");
 
 var _liffRequest = require("./liff-request");
+
+var _oauthIssueTokenRequest = require("./oauth-issue-token-request");
+
+var _oauthRevokeTokenRequest = require("./oauth-revoke-token-request");
 
 var _richMenuAddRequest = require("./rich-menu-add-request");
 

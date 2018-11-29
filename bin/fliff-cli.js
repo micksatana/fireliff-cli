@@ -167,39 +167,20 @@ if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
         break;
 
       case 'get':
-        req = new _.LIFFGetRequest({
-          accessToken
-        });
-
-        try {
-          console.log('Sending request to get LIFF view(s)...'.verbose);
-          res = await req.send();
-          console.table(res.data.apps.map(app => {
-            const views = Object.keys(config.views).filter(key => {
-              return config.views[key] === app.liffId;
-            });
-            return {
-              'View': views.join(', '),
-              'LIFF ID': app.liffId,
-              'Type': app.view.type,
-              'URL': app.view.url
-            };
-          }));
-        } catch (error) {
-          if (error.response && error.response.data) {
-            if (error.response.data.message === 'no apps') {
-              console.log('LIFF app not found'.info);
-              process.exit(0);
-            } else {
-              console.error(error.response.data.error);
-              process.exit(1);
-            }
+        console.log('Sending request to get LIFF view(s)...'.verbose);
+        fliff.get(options).then(rsGet => {
+          if (typeof rsGet === 'string') {
+            console.log(rsGet);
           } else {
-            console.error(error);
-            process.exit(1);
+            console.table(rsGet);
           }
-        }
 
+          return rsGet;
+        }).catch(errGet => {
+          const message = errGet.message || errGet;
+          console.log(message.error);
+          process.exit(1);
+        });
         break;
 
       case 'update':

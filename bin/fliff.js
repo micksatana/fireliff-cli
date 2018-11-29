@@ -23,6 +23,8 @@ var _functionsConfig = require("./functions-config");
 
 var _liffConfig = require("./liff-config");
 
+var _liffGetRequest = require("./liff-get-request");
+
 var _liffUpdateRequest = require("./liff-update-request");
 
 var _oauthIssueTokenRequest = require("./oauth-issue-token-request");
@@ -170,7 +172,7 @@ class FLIFF {
     }
 
     if (options.issue === true) {
-      if (!_functionsConfig.FunctionsConfig.ChannelId && !_functionsConfig.FunctionsConfig.ChannelSecret) {
+      if (!_functionsConfig.FunctionsConfig.ChannelId || !_functionsConfig.FunctionsConfig.ChannelSecret) {
         return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.IssueTokenRequiredChannelIdAndSecret));
       }
 
@@ -188,6 +190,8 @@ class FLIFF {
             await _functionsConfig.FunctionsConfig.set(`${_functionsConfig.FunctionsConfig.SingleChannelGroup}.${_functionsConfig.FunctionsConfig.AccessTokenName}`, tokenData.accessToken);
             return tokenData;
           }
+
+          return tokenData;
         } else {
           return Promise.reject(new _fliffError.FLIFFError(res.statusText));
         }
@@ -215,8 +219,6 @@ class FLIFF {
         }
       }
     }
-
-    return;
   }
 
   async update(options) {
@@ -272,6 +274,37 @@ class FLIFF {
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {
         return Promise.reject(error.response.data.message.error);
+      } else {
+        return Promise.reject(error);
+      }
+    }
+  }
+
+  async get() {
+    const req = new _liffGetRequest.LIFFGetRequest({
+      accessToken: _functionsConfig.FunctionsConfig.AccessToken
+    });
+
+    try {
+      const res = await req.send();
+      return res.data.apps.map(app => {
+        const views = Object.keys(_functionsConfig.FunctionsConfig.config.views).filter(key => {
+          return _functionsConfig.FunctionsConfig.config.views[key] === app.liffId;
+        });
+        return {
+          'View': views.join(', '),
+          'LIFF ID': app.liffId,
+          'Type': app.view.type,
+          'URL': app.view.url
+        };
+      });
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        if (error.response.data.message === 'no apps') {
+          return 'LIFF app not found'.info;
+        } else {
+          return Promise.reject(error.response.data.message.error);
+        }
       } else {
         return Promise.reject(error);
       }
