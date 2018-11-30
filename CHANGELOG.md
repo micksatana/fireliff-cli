@@ -7,6 +7,8 @@
  - `fliff add` auto correct `name` option before set to Firebase Functions configuration to avoid error
  - `fliff add` can add `features.ble` and `description`
  - `fliff add` without `description` will set default description with `name` option
+ - `fliff config` can set channel ID and secret
+ - `fliff token` can issue and revoke short-lived access token
 
 ## [1.3.0] - 2018-11-20
 ### Added
