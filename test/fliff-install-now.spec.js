@@ -8,6 +8,14 @@ jest.mock('child_process');
 describe('fliff installNow method', () => {
     const initPath = 'cache';
 
+    beforeAll(() => {
+        jest.spyOn(console, 'log').mockImplementation(() => { });
+    });
+
+    afterAll(() => {
+        console.log.mockRestore();
+    });
+
     describe('when get fail', () => {
         let fliff;
         let rsInstall;
@@ -50,7 +58,7 @@ describe('fliff installNow method', () => {
 
         describe('and success', () => {
             let fliff;
-    
+
             beforeAll(() => {
                 jest.spyOn(prompt, 'start').mockImplementation(() => { });
                 jest.spyOn(prompt, 'get').mockImplementation((arr, callback) => {
@@ -70,22 +78,22 @@ describe('fliff installNow method', () => {
                 });
                 fliff = new FLIFF();
             });
-    
+
             afterAll(() => {
                 prompt.start.mockRestore();
                 prompt.get.mockRestore();
                 childProcess.spawn.mockRestore();
             });
-    
+
             it('resolve true', async () => {
                 await expect(fliff.installNow(initPath)).resolves.toEqual(true);
-            });    
+            });
 
         });
 
         describe('and fail', () => {
             let fliff;
-    
+
             beforeAll(async () => {
                 jest.spyOn(prompt, 'start').mockImplementation(() => { });
                 jest.spyOn(prompt, 'get').mockImplementation((arr, callback) => {
@@ -105,20 +113,19 @@ describe('fliff installNow method', () => {
                 });
                 fliff = new FLIFF();
             });
-    
+
             afterAll(() => {
                 prompt.start.mockRestore();
                 prompt.get.mockRestore();
                 childProcess.spawn.mockRestore();
             });
-    
+
             it('reject with code', async () => {
                 await expect(fliff.installNow(initPath)).rejects.toEqual(1);
-            });    
+            });
 
         });
 
     });
-
 
 });

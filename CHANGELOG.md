@@ -1,7 +1,12 @@
 # Changelog
 ## [1.4.0]
+### Added
  - `fliff update` can update partially
  - `fliff update` can update `features.ble` and `description`
+ - `fliff add` can omit `type` option, it will be `full` by default
+ - `fliff add` auto correct `name` option before set to Firebase Functions configuration to avoid error
+ - `fliff add` can add `features.ble` and `description`
+ - `fliff add` without `description` will set default description with `name` option
 
 ## [1.3.0] - 2018-11-20
 ### Added

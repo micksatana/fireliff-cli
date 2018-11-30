@@ -52,7 +52,9 @@ describe('fliff add', () => {
     describe('when name and url options provided but omit type option', () => {
         const options = {
             name: 'test1',
-            url: 'https://www.facebook.com/intocode'
+            url: 'https://www.facebook.com/intocode',
+            description: 'Blah blah',
+            ble: 'true'
         };
 
         describe('and able to send and set view', () => {
@@ -75,6 +77,10 @@ describe('fliff add', () => {
                     view: {
                         type: 'full',
                         url: options.url
+                    },
+                    description: options.description,
+                    features: {
+                        ble: true
                     }
                 });
             });
@@ -93,9 +99,10 @@ describe('fliff add', () => {
 
     describe('when all options provided', () => {
         const options = {
-            name: 'test1',
+            name: 'Test 1',
             type: 'compact',
-            url: 'https://www.facebook.com/intocode'
+            url: 'https://www.facebook.com/intocode',
+            ble: 'false'
         };
 
         describe('and able to send', () => {
@@ -120,12 +127,16 @@ describe('fliff add', () => {
                         view: {
                             type: options.type,
                             url: options.url
+                        },
+                        description: options.name,
+                        features: {
+                            ble: false
                         }
                     });
                 });
 
                 it('set view', () => {
-                    expect(LIFFConfig.setView).toHaveBeenCalledWith(options.name, fakeSentResult.data.liffId);
+                    expect(LIFFConfig.setView).toHaveBeenCalledWith(options.name.toLowerCase().replace(/\s/g, '_'), fakeSentResult.data.liffId);
                 });
 
                 it('return correct result', () => {
