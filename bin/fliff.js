@@ -23,6 +23,8 @@ var _functionsConfig = require("./functions-config");
 
 var _liffConfig = require("./liff-config");
 
+var _liffAddRequest = require("./liff-add-request");
+
 var _liffDeleteRequest = require("./liff-delete-request");
 
 var _liffGetRequest = require("./liff-get-request");
@@ -37,10 +39,13 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 const copy = require('recursive-copy');
 
+const AddRequiredNameAndUrl = `Command ${'fliff add'.prompt} required name and url options`.warn + _os.EOL + `Try re-run with option ${'--name <viewName>'.input} AND ${'--url <viewURL>'.input}`.help;
 const ConfigRequiredIdSecretOrName = `Failed to configure channel. ${'fliff config'.prompt} required id, secret or token options.`.error + _os.EOL + `Try re-run with option ${'--id <channelId>'.input} OR ${'--secret <channelSecret>'.input} OR ${'--token <channelToken>'.input}`.help;
 const DeleteRequiredIdOrName = `Command ${'fliff delete'.prompt} required LIFF ID or name option`.warn + _os.EOL + `Try re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help;
+const FailedToAddLIFF = `Failed to add LIFF view`.error;
 const FailedToRetrieveIdUsingName = `Failed to retrieve LIFF ID using view name`.error;
 const FailedToRetrieveNameUsingId = `Failed to retrieve view name using LIFF ID`.error;
+const FailedToSetView = `Failed to set view in Functions configuration`.error;
 const FailedToUnsetViews = `Failed to unset view(s) in Functions configuration`.error;
 const RevokeTokenRequiredAccessToken = `Command ${'fliff token --revoke'.prompt} required access token.`.warn + _os.EOL + `Try re-run with access token ${'fliff token --revoke <accessToken>'.input}`.help;
 const IssueTokenRequiredChannelIdAndSecret = `Command ${'fliff token'.prompt} required Channel ID and Secret to be configured first`.error + _os.EOL + `Try run ${'fliff config --id <channelId> --secret <channelSecret>'.input} to configure before re-run ${'fliff token'.prompt} again.`.help;
@@ -50,10 +55,13 @@ const UpdateRequiredIdOrName = `Command ${'fliff update'.prompt} required LIFF I
 class FLIFF {
   static get ErrorMessages() {
     return {
+      AddRequiredNameAndUrl,
       ConfigRequiredIdSecretOrName,
       DeleteRequiredIdOrName,
+      FailedToAddLIFF,
       FailedToRetrieveIdUsingName,
       FailedToRetrieveNameUsingId,
+      FailedToSetView,
       FailedToUnsetViews,
       RevokeTokenRequiredAccessToken,
       IssueTokenRequiredChannelIdAndSecret,
@@ -132,6 +140,43 @@ class FLIFF {
   }
 
   constructor() {}
+
+  async add(options) {
+    if (!options.name || !options.url) {
+      return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.AddRequiredNameAndUrl));
+    }
+
+    if (!options.type) {
+      options.type = 'full';
+    }
+
+    const req = new _liffAddRequest.LIFFAddRequest({
+      accessToken: _functionsConfig.FunctionsConfig.AccessToken
+    });
+    const data = {
+      view: {
+        type: options.type,
+        url: options.url
+      }
+    };
+    let res;
+
+    try {
+      res = await req.send(data);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        return Promise.reject(new _fliffError.FLIFFError(error.response.data.message.error));
+      } else {
+        return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.FailedToAddLIFF));
+      }
+    }
+
+    try {
+      return await _liffConfig.LIFFConfig.setView(options.name, res.data.liffId);
+    } catch (error) {
+      return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.FailedToSetView));
+    }
+  }
 
   async config(options) {
     let result = {};
@@ -228,10 +273,6 @@ class FLIFF {
   }
 
   async delete(options) {
-    const req = new _liffDeleteRequest.LIFFDeleteRequest({
-      accessToken: _functionsConfig.FunctionsConfig.AccessToken
-    });
-
     if (!options.id && !options.name) {
       return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.DeleteRequiredIdOrName));
     }
@@ -253,6 +294,9 @@ class FLIFF {
     }
 
     try {
+      const req = new _liffDeleteRequest.LIFFDeleteRequest({
+        accessToken: _functionsConfig.FunctionsConfig.AccessToken
+      });
       await req.send(options.id);
     } catch (error) {
       if (error.response && error.response.data) {
@@ -274,9 +318,6 @@ class FLIFF {
   }
 
   async update(options) {
-    const req = new _liffUpdateRequest.LIFFUpdateRequest({
-      accessToken: _functionsConfig.FunctionsConfig.AccessToken
-    });
     let data = {};
 
     if (!options.id && !options.name) {
@@ -322,6 +363,9 @@ class FLIFF {
     }
 
     try {
+      const req = new _liffUpdateRequest.LIFFUpdateRequest({
+        accessToken: _functionsConfig.FunctionsConfig.AccessToken
+      });
       return await req.send(options.id, data);
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {
@@ -333,11 +377,10 @@ class FLIFF {
   }
 
   async get() {
-    const req = new _liffGetRequest.LIFFGetRequest({
-      accessToken: _functionsConfig.FunctionsConfig.AccessToken
-    });
-
     try {
+      const req = new _liffGetRequest.LIFFGetRequest({
+        accessToken: _functionsConfig.FunctionsConfig.AccessToken
+      });
       const res = await req.send();
       return res.data.apps.map(app => {
         const views = Object.keys(_functionsConfig.FunctionsConfig.config.views).filter(key => {

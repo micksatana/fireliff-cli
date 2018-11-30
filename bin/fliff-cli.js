@@ -7,8 +7,6 @@ var path = _interopRequireWildcard(require("path"));
 
 var _package = _interopRequireDefault(require("../package.json"));
 
-var _ = require(".");
-
 require("./colors-set-theme");
 
 var _fliff = require("./fliff.js");
@@ -71,45 +69,18 @@ const options = commandLineArgs([{
 const fliff = new _fliff.FLIFF(); // Commands that need Functions config
 
 if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
-  (0, _shared.getValidatedConfig)().then(async config => {
-    const accessToken = config.line.access_token;
-    let viewNames;
-    let data;
-    let req;
-    let res;
-
+  (0, _shared.getValidatedConfig)().then(() => {
     switch (operation) {
       case 'add':
-        req = new _.LIFFAddRequest({
-          accessToken
+        console.log('Sending request to add LIFF view...'.verbose);
+        fliff.add(options).then(rsAdd => {
+          console.log(`Created ${options.name.input} view with LIFF ID: ${rsAdd.info}`.verbose);
+          return rsAdd;
+        }).catch(errAdd => {
+          const message = errAdd.message || errAdd;
+          console.log(message.error);
+          process.exit(1);
         });
-        data = {
-          view: {
-            type: options.type,
-            url: options.url
-          }
-        };
-
-        try {
-          console.log('Sending request to add LIFF view...'.verbose);
-          res = await req.send(data);
-        } catch (error) {
-          console.log(`Failed to add LIFF view`.error);
-          console.error(error);
-          process.exit(1);
-        }
-
-        try {
-          console.log(`Created ${options.name.input} view with LIFF ID: ${res.data.liffId.info}`.verbose);
-          await _.LIFFConfig.setView(options.name, res.data.liffId);
-        } catch (error) {
-          console.log(`Failed to set Functions configuration`.error);
-          console.log(`Try re-run with the following command`.help);
-          console.log(`firebase functions:config:set views.${options.name}=${res.data.liffId}`.code);
-          console.error(error);
-          process.exit(1);
-        }
-
         break;
 
       case 'delete':
