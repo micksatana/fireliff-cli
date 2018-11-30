@@ -68,8 +68,13 @@ After run successfully, you will get a `web-views` LIFF project folder. This sub
 
 
 ### Add LIFF view
+Add LIFF using view `--name` and `--url` options. We make `--type` option as optional in FireLIFF CLI to shorten the command line. So you can omit `--type`, it will be `full` by default. 
 ```
-fliff add --name <viewName> --type <viewType> --url <viewUrl>
+fliff add --name <viewName> --url <viewUrl>
+```
+If you prefer to specify type, run with `--type` option. It can be `full`, `tall` or `compact`.
+```
+fliff add --name <viewName> --url <viewUrl> --type <viewType>
 ```
 
 ### Update LIFF view

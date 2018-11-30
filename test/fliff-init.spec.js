@@ -1,10 +1,12 @@
+import { FLIFF } from '../lib/fliff';
+
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const path = require('path');
 const rimraf = require('rimraf');
 const { spawn } = require('child_process');
 
-describe('fliff init', () => {
+describe('fliff init success', () => {
     const fliffPath = path.resolve(__dirname, '../bin/fliff-cli.js');
     const initFolder = 'web-views';
     const testTime = (new Date()).getTime();
@@ -55,4 +57,91 @@ describe('fliff init', () => {
         rimraf.sync(testFolderPath);
         console.log.mockRestore();
     });
+
+});
+
+describe('fliff init fail', () => {
+
+    describe('when path already exist', () => {
+        let fliff;
+        let cachePath = 'cache';
+
+        beforeAll(() => {
+            jest.mock('recursive-copy');
+            jest.spyOn(fs, 'mkdir').mockImplementation((initPath, callback) => {
+                callback({
+                    code: 'EEXIST'
+                });
+            });
+
+            fliff = new FLIFF();
+        });
+
+        it('reject with error', async () => {
+            await expect(fliff.init(cachePath)).rejects.toThrowError(FLIFF.ErrorMessages.FailedToInitPathExists(cachePath));
+        });
+
+        afterAll(() => {
+            copy.mockRestore();
+            fs.mkdir.mockRestore();
+        });
+
+    });
+
+    describe('when has unknown error while creating path', () => {
+        const fakeError = new Error('something else');
+        let fliff;
+        let cachePath = 'cache';
+
+        beforeAll(() => {
+            jest.spyOn(fs, 'mkdir').mockImplementation((initPath, mkDirOptions, callback) => {
+                if (typeof mkDirOptions === 'function') {
+                    callback = mkDirOptions;
+                }
+                callback(fakeError);
+            });
+
+            fliff = new FLIFF();
+        });
+
+        it('reject with error', async () => {
+            await expect(fliff.init(cachePath)).rejects.toThrowError(fakeError);
+        });
+
+        afterAll(() => {
+            fs.mkdir.mockRestore();
+        });
+
+    });
+
+    describe('when fail to copy', () => {
+        let fliff;
+        let cachePath = 'cache';
+
+        beforeAll(() => {
+            jest.mock('recursive-copy', () => {
+                return jest.fn().mockImplementation((webviewPath, initPath, copyOptions, callback) => {
+                    callback(new Error('Copy error'), []);
+                });
+            });
+            jest.spyOn(fs, 'mkdir').mockImplementation((initPath, mkDirOptions, callback) => {
+                if (typeof mkDirOptions === 'function') {
+                    callback = mkDirOptions;
+                }
+                callback(null);
+            });
+
+            fliff = new FLIFF();
+        });
+
+        it('reject with error', async () => {
+            await expect(fliff.init(cachePath)).rejects.toThrowError(new Error('Copy error'));
+        });
+
+        afterAll(() => {
+            jest.unmock('recursive-copy');
+            fs.mkdir.mockRestore();
+        });
+    });
+
 });
