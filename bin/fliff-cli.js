@@ -113,57 +113,16 @@ if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
         break;
 
       case 'delete':
-        req = new _.LIFFDeleteRequest({
-          accessToken
-        });
-
-        if (!options.id && !options.name) {
-          console.warn(`Command ${'fliff delete'.prompt} required LIFF ID or name option`.warn);
-          console.log(`Try re-run ${'fliff delete --id <liffId>'.input} OR  ${'fliff delete --name <viewName>'.input}`.help);
-          process.exit(1);
-        }
-
-        if (options.name) {
-          options.id = await _.LIFFConfig.getViewIdByName(options.name, config);
-
-          if (typeof options.id !== 'string') {
-            console.error(`Failed to retrieve LIFF ID with view name ${options.name.input}`.error);
-            process.exit(1);
-          }
-        }
-
-        try {
-          console.log(`Sending request to delete LIFF view ${options.id.input}`.verbose);
-          res = await req.send(options.id);
+        console.log(`Sending request to delete LIFF view(s)...`.verbose);
+        fliff.delete(options).then(rsDelete => {
           console.log(`Deleted view with LIFF ID: ${options.id.input}`.verbose);
-        } catch (error) {
-          if (error.response && error.response.data) {
-            if (error.response.data.message === 'not found') {
-              console.log('LIFF app not found'.info);
-            } else {
-              console.log(`Failed to delete LIFF view ${options.id.input}`.error);
-              console.error(error.response.data.error);
-              process.exit(1);
-            }
-          } else {
-            console.log(`Failed to delete LIFF view ${options.id.input}`.error);
-            console.error(error);
-            process.exit(1);
-          }
-        }
-
-        try {
-          viewNames = await _.LIFFConfig.getViewNamesById(options.id, config);
-          await Promise.all(viewNames.map(viewName => _.LIFFConfig.unsetView(viewName)));
-          console.log(`Unset view(s) in Functions configuration`.info, viewNames);
-        } catch (error) {
-          console.log(`Failed to unset view(s) in Functions configuration`.error);
-          console.log(`Try looking for view name with LIFF ID ${options.id.input} using ${'fliff get'.prompt} command and unset it manually`.help);
-          console.log(`firebase functions:config:unset views.<viewName>`.code);
-          console.error(error);
+          console.log(`Unset view(s) in Functions configuration`.info, rsDelete);
+          return rsDelete;
+        }).catch(errDelete => {
+          const message = errDelete.message || errDelete;
+          console.log(message.error);
           process.exit(1);
-        }
-
+        });
         break;
 
       case 'get':

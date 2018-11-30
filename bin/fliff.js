@@ -23,6 +23,8 @@ var _functionsConfig = require("./functions-config");
 
 var _liffConfig = require("./liff-config");
 
+var _liffDeleteRequest = require("./liff-delete-request");
+
 var _liffGetRequest = require("./liff-get-request");
 
 var _liffUpdateRequest = require("./liff-update-request");
@@ -36,8 +38,10 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 const copy = require('recursive-copy');
 
 const ConfigRequiredIdSecretOrName = `Failed to configure channel. ${'fliff config'.prompt} required id, secret or token options.`.error + _os.EOL + `Try re-run with option ${'--id <channelId>'.input} OR ${'--secret <channelSecret>'.input} OR ${'--token <channelToken>'.input}`.help;
+const DeleteRequiredIdOrName = `Command ${'fliff delete'.prompt} required LIFF ID or name option`.warn + _os.EOL + `Try re-run with option ${'--id <liffId>'.input} OR ${'--name <viewName>'.input}`.help;
 const FailedToRetrieveIdUsingName = `Failed to retrieve LIFF ID using view name`.error;
 const FailedToRetrieveNameUsingId = `Failed to retrieve view name using LIFF ID`.error;
+const FailedToUnsetViews = `Failed to unset view(s) in Functions configuration`.error;
 const RevokeTokenRequiredAccessToken = `Command ${'fliff token --revoke'.prompt} required access token.`.warn + _os.EOL + `Try re-run with access token ${'fliff token --revoke <accessToken>'.input}`.help;
 const IssueTokenRequiredChannelIdAndSecret = `Command ${'fliff token'.prompt} required Channel ID and Secret to be configured first`.error + _os.EOL + `Try run ${'fliff config --id <channelId> --secret <channelSecret>'.input} to configure before re-run ${'fliff token'.prompt} again.`.help;
 const TokenRequiredIssueOrRevoke = `Command ${'fliff token'.prompt} required issue or revoke options.`.error + _os.EOL + `Try re-run with option ${'--issue'.input} OR ${'--revoke'.input}`.help;
@@ -47,8 +51,10 @@ class FLIFF {
   static get ErrorMessages() {
     return {
       ConfigRequiredIdSecretOrName,
+      DeleteRequiredIdOrName,
       FailedToRetrieveIdUsingName,
       FailedToRetrieveNameUsingId,
+      FailedToUnsetViews,
       RevokeTokenRequiredAccessToken,
       IssueTokenRequiredChannelIdAndSecret,
       TokenRequiredIssueOrRevoke,
@@ -218,6 +224,52 @@ class FLIFF {
           return Promise.reject(error);
         }
       }
+    }
+  }
+
+  async delete(options) {
+    const req = new _liffDeleteRequest.LIFFDeleteRequest({
+      accessToken: _functionsConfig.FunctionsConfig.AccessToken
+    });
+
+    if (!options.id && !options.name) {
+      return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.DeleteRequiredIdOrName));
+    }
+
+    if (!options.id) {
+      options.id = await _liffConfig.LIFFConfig.getViewIdByName(options.name, _functionsConfig.FunctionsConfig.config);
+
+      if (typeof options.id !== 'string') {
+        return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.FailedToRetrieveIdUsingName));
+      }
+    }
+
+    if (!options.name) {
+      options.name = await _liffConfig.LIFFConfig.getViewNameById(options.id, _functionsConfig.FunctionsConfig.config);
+
+      if (typeof options.name !== 'string') {
+        return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.FailedToRetrieveNameUsingId));
+      }
+    }
+
+    try {
+      await req.send(options.id);
+    } catch (error) {
+      if (error.response && error.response.data) {
+        if (error.response.data.message !== 'not found') {
+          return Promise.reject(error.response.data.error);
+        }
+      } else {
+        return Promise.reject(error);
+      }
+    }
+
+    try {
+      const viewNames = await _liffConfig.LIFFConfig.getViewNamesById(options.id, _functionsConfig.FunctionsConfig.config);
+      await Promise.all(viewNames.map(viewName => _liffConfig.LIFFConfig.unsetView(viewName)));
+      return viewNames;
+    } catch (error) {
+      return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.FailedToUnsetViews));
     }
   }
 
