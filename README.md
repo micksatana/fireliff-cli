@@ -105,8 +105,13 @@ fliff delete --name <viewName>
 ```
 
 ### Get LIFF views
+List LIFF apps
 ```
 fliff get
+```
+List LIFF apps with description and Bluetooth® Low Energy (BLE) flag
+```
+fliff get --detail
 ```
 
 ### Add RichMenu
