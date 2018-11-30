@@ -1,6 +1,6 @@
 {
   "name": "@intocode-io/fireliff-cli",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Command line interface for building LIFF app on Firebase",
   "main": "lib/index.js",
   "bin": {
