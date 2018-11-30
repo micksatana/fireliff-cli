@@ -161,10 +161,24 @@ if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
     }
   });
 } else if (operation) {
+  const initPath = path.resolve(process.cwd(), 'web-views');
+
   switch (operation) {
     case 'init':
-      _fliff.FLIFF.init(path.resolve(process.cwd(), 'web-views'));
+      fliff.init(initPath).then(rsInit => {
+        console.log('Generated files'.info);
+        rsInit.files.forEach(dest => console.log(dest.info));
 
+        if (rsInit.message) {
+          console.log(rsInit.message);
+        }
+
+        return true;
+      }).then(() => fliff.installNow(initPath)).catch(errInit => {
+        const message = errInit.message || errInit;
+        console.log(message.error);
+        process.exit(1);
+      });
       break;
 
     case 'version':
