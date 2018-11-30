@@ -63,6 +63,9 @@ const options = commandLineArgs([{
   name: 'version',
   alias: 'v',
   type: Boolean
+}, {
+  name: 'detail',
+  type: Boolean
 }], {
   argv
 });
@@ -99,10 +102,10 @@ if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
       case 'get':
         console.log('Sending request to get LIFF view(s)...'.verbose);
         fliff.get(options).then(rsGet => {
-          if (typeof rsGet === 'string') {
-            console.log(rsGet);
-          } else {
+          if (Array.isArray(rsGet)) {
             console.table(rsGet);
+          } else {
+            console.log(rsGet);
           }
 
           return rsGet;

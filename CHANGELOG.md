@@ -9,6 +9,7 @@
  - `fliff add` without `description` will set default description with `name` option
  - `fliff config` can set channel ID and secret
  - `fliff token` can issue and revoke short-lived access token
+ - `fliff get` support `--detail` option to display Description and BLE
 
 ## [1.3.0] - 2018-11-20
 ### Added

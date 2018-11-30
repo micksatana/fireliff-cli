@@ -400,7 +400,7 @@ class FLIFF {
     }
   }
 
-  async get() {
+  async get(options) {
     try {
       const req = new _liffGetRequest.LIFFGetRequest({
         accessToken: _functionsConfig.FunctionsConfig.AccessToken
@@ -410,12 +410,19 @@ class FLIFF {
         const views = Object.keys(_functionsConfig.FunctionsConfig.config.views).filter(key => {
           return _functionsConfig.FunctionsConfig.config.views[key] === app.liffId;
         });
-        return {
+        const row = {
           'View': views.join(', '),
           'LIFF ID': app.liffId,
           'Type': app.view.type,
           'URL': app.view.url
         };
+
+        if (options.detail) {
+          row.Description = app.description || '';
+          row.BLE = app.features && app.features.ble ? '\u2713' : '\u2613';
+        }
+
+        return row;
       });
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {
