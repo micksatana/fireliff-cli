@@ -165,6 +165,8 @@ class FLIFF {
       options.type = 'full';
     }
 
+    const name = options.name.toLowerCase().replace(/\s/g, '_');
+    const description = options.description ? options.description : options.name;
     const req = new _liffAddRequest.LIFFAddRequest({
       accessToken: _functionsConfig.FunctionsConfig.AccessToken
     });
@@ -172,9 +174,16 @@ class FLIFF {
       view: {
         type: options.type,
         url: options.url
-      }
+      },
+      description
     };
     let res;
+
+    if (options.ble) {
+      data.features = {
+        ble: options.ble.toLowerCase() == 'false' ? false : true
+      };
+    }
 
     try {
       res = await req.send(data);
@@ -187,7 +196,7 @@ class FLIFF {
     }
 
     try {
-      return await _liffConfig.LIFFConfig.setView(options.name, res.data.liffId);
+      return await _liffConfig.LIFFConfig.setView(name, res.data.liffId);
     } catch (error) {
       return Promise.reject(new _fliffError.FLIFFError(FLIFF.ErrorMessages.FailedToSetView));
     }
