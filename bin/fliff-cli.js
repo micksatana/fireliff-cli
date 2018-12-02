@@ -13,11 +13,15 @@ var _fliff = require("./fliff.js");
 
 var _shared = require("./shared");
 
+var _fliffCliUsage = _interopRequireWildcard(require("./fliff-cli-usage"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 const commandLineArgs = require('command-line-args');
+
+const commandLineUsage = require('command-line-usage');
 
 const {
   operation,
@@ -66,10 +70,51 @@ const options = commandLineArgs([{
 }, {
   name: 'detail',
   type: Boolean
+}, {
+  name: 'help',
+  type: Boolean
 }], {
   argv
 });
-const fliff = new _fliff.FLIFF(); // Commands that need Functions config
+const fliff = new _fliff.FLIFF();
+
+if (options.help) {
+  switch (operation) {
+    case 'add':
+      console.log(commandLineUsage(_fliffCliUsage.addUsage));
+      break;
+
+    case 'update':
+      console.log(commandLineUsage(_fliffCliUsage.updateUsage));
+      break;
+
+    case 'delete':
+      console.log(commandLineUsage(_fliffCliUsage.deleteUsage));
+      break;
+
+    case 'get':
+      console.log(commandLineUsage(_fliffCliUsage.getUsage));
+      break;
+
+    case 'token':
+      console.log(commandLineUsage(_fliffCliUsage.tokenUsage));
+      break;
+
+    case 'init':
+      console.log(commandLineUsage(_fliffCliUsage.initUsage));
+      break;
+
+    case 'config':
+      console.log(commandLineUsage(_fliffCliUsage.configUsage));
+      break;
+
+    default:
+      console.log(commandLineUsage(_fliffCliUsage.default));
+  }
+
+  process.exit(0);
+} // Commands that need Functions config
+
 
 if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
   (0, _shared.getValidatedConfig)().then(() => {
@@ -203,10 +248,12 @@ if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
       break;
 
     case 'help':
-    default: // TODO: Display help message
-
+    default:
+      console.log(commandLineUsage(_fliffCliUsage.default));
   }
 } else if (options.version) {
   console.log(`Version: ${_package.default.version}`);
+} else {
+  console.log(commandLineUsage(_fliffCliUsage.default));
 }
 //# sourceMappingURL=fliff-cli.js.map
