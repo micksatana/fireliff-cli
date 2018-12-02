@@ -17,3 +17,4 @@
 - [ ] Related test cases are included
 - [ ] I've run `npm run test` and all tests are green
 - [ ] I've updated the documentation accordingly
+- [ ] In case of changing documents, I've update `lib/{related command}-usage.js` file accordingly
