@@ -1,4 +1,8 @@
 # Changelog
+## [Unreleased]
+### Fixed
+ - Fixed unknown option
+
 ## [1.4.1] - 2018-12-02
 ### Added
  - `--help` option to display usages of CLIs

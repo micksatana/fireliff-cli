@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getValidatedConfig = getValidatedConfig;
+exports.commandErrorHandler = commandErrorHandler;
 
 var _functionsConfig = require("./functions-config");
 
@@ -23,6 +24,19 @@ async function getValidatedConfig() {
   } catch (error) {
     console.log(error);
     process.exit(1);
+  }
+}
+
+function commandErrorHandler(error) {
+  switch (error.name) {
+    case 'UNKNOWN_OPTION':
+      console.log(`Unknown option ${error.optionName.input}`.error);
+      process.exit(1);
+      break;
+
+    default:
+      console.log(error.toString().error);
+      process.exit(1);
   }
 }
 //# sourceMappingURL=shared.js.map
