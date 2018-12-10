@@ -68,7 +68,7 @@ try {
   }); // Commands that need Functions config
 
   if (['add', 'delete', 'get', 'default', 'link', 'unlink'].indexOf(operation) > -1) {
-    (0, _shared.getValidatedConfig)().then(async config => {
+    (0, _shared.getConfig)().then(async config => {
       let accessToken = config.line.access_token;
       let names;
       let data;
@@ -77,6 +77,7 @@ try {
       let req;
       let res;
       let uploadReq;
+      (0, _shared.validateConfig)(config);
 
       switch (operation) {
         case 'add':

@@ -119,9 +119,10 @@ try {
 
 
   if (['add', 'update', 'delete', 'get', 'token'].indexOf(operation) > -1) {
-    (0, _shared.getValidatedConfig)().then(() => {
+    (0, _shared.getConfig)().then(config => {
       switch (operation) {
         case 'add':
+          (0, _shared.validateConfig)(config);
           console.log('Sending request to add LIFF view...'.verbose);
           fliff.add(options).then(rsAdd => {
             console.log(`Created ${options.name.input} view with LIFF ID: ${rsAdd.info}`.verbose);
@@ -134,6 +135,7 @@ try {
           break;
 
         case 'delete':
+          (0, _shared.validateConfig)(config);
           console.log(`Sending request to delete LIFF view(s)...`.verbose);
           fliff.delete(options).then(rsDelete => {
             console.log(`Deleted view with LIFF ID: ${options.id.input}`.verbose);
@@ -147,6 +149,7 @@ try {
           break;
 
         case 'get':
+          (0, _shared.validateConfig)(config);
           console.log('Sending request to get LIFF view(s)...'.verbose);
           fliff.get(options).then(rsGet => {
             if (Array.isArray(rsGet)) {
@@ -164,6 +167,7 @@ try {
           break;
 
         case 'update':
+          (0, _shared.validateConfig)(config);
           console.log(`Sending request to update LIFF view`.verbose);
           fliff.update(options).then(rsUpdate => {
             console.log(`Updated LIFF ID: ${options.id.input}`.info);
