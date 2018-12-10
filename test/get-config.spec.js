@@ -1,9 +1,9 @@
-import { getValidatedConfig } from '../lib/shared';
+import { getConfig } from '../lib/shared';
 import { FunctionsConfig } from '../lib/functions-config';
 
-describe('getValidatedConfig', () => {
+describe('getConfig', () => {
     beforeAll(() => {
-        // getValidatedConfig display lots of things via console.log, we don't want to see while testing
+        // getConfig display lots of things via console.log, we don't want to see while testing
         jest.spyOn(console, 'log').mockImplementation(() => {});
     });
     
@@ -24,7 +24,7 @@ describe('getValidatedConfig', () => {
 
         beforeAll(async () => {
             jest.spyOn(FunctionsConfig, 'get').mockResolvedValue(config);
-            result = await getValidatedConfig();
+            result = await getConfig();
         });
 
         it('should get config', () => {
@@ -41,39 +41,6 @@ describe('getValidatedConfig', () => {
 
     });
 
-    describe('when able to get config without line.access_token', () => {
-        const config = {
-            line: {},
-            views: {
-                'test-shared': 'test-asdflhaso'
-            },
-            richmenus: {
-                'test-shared': 'test-sdlhfow3f'
-            }
-        };
-
-        beforeAll(async () => {
-            jest.spyOn(FunctionsConfig, 'get').mockResolvedValue(config);
-            jest.spyOn(process, 'exit').mockImplementation(() => {});
-            await getValidatedConfig();
-        });
-
-        it('should get config', () => {
-            expect(FunctionsConfig.get).toHaveBeenCalledTimes(1);
-        });
-
-        it('should exit with status 1', () => {
-            expect(process.exit).toHaveBeenCalledTimes(1);
-            expect(process.exit).toHaveBeenCalledWith(1);
-        });
-
-        afterAll(() => {
-            FunctionsConfig.get.mockRestore();
-            process.exit.mockRestore();
-        });
-
-    });
-
     describe('when cannot get config', () => {
         const expectedError = new Error('Error while getting config');
 
@@ -82,7 +49,7 @@ describe('getValidatedConfig', () => {
                 throw expectedError;
             });
             jest.spyOn(process, 'exit').mockImplementation(() => {});
-            await getValidatedConfig();
+            await getConfig();
         });
 
         it('should get config and fail', () => {
