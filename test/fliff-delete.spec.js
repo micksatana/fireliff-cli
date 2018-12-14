@@ -163,7 +163,7 @@ describe('fliff delete', () => {
                 });
 
                 it('reject with error', async () => {
-                    await expect(fliff.delete(options)).rejects.toThrowError(new FLIFFError(FLIFF.ErrorMessages.FailedToUnsetViews));
+                    await expect(fliff.delete(options)).rejects.toThrow(new FLIFFError(FLIFF.ErrorMessages.FailedToUnsetViews));
                 });
 
             });

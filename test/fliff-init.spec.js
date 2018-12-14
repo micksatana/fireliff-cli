@@ -78,7 +78,7 @@ describe('fliff init fail', () => {
         });
 
         it('reject with error', async () => {
-            await expect(fliff.init(cachePath)).rejects.toThrowError(FLIFF.ErrorMessages.FailedToInitPathExists(cachePath));
+            await expect(fliff.init(cachePath)).rejects.toThrow(FLIFF.ErrorMessages.FailedToInitPathExists(cachePath));
         });
 
         afterAll(() => {
@@ -105,7 +105,7 @@ describe('fliff init fail', () => {
         });
 
         it('reject with error', async () => {
-            await expect(fliff.init(cachePath)).rejects.toThrowError(fakeError);
+            await expect(fliff.init(cachePath)).rejects.toThrow(fakeError);
         });
 
         afterAll(() => {
@@ -135,7 +135,7 @@ describe('fliff init fail', () => {
         });
 
         it('reject with error', async () => {
-            await expect(fliff.init(cachePath)).rejects.toThrowError(new Error('Copy error'));
+            await expect(fliff.init(cachePath)).rejects.toThrow(new Error('Copy error'));
         });
 
         afterAll(() => {

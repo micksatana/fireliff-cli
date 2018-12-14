@@ -161,7 +161,7 @@ describe('fliff add', () => {
                 });
 
                 it('reject with error', async () => {
-                    await expect(fliff.add(options)).rejects.toThrowError(new FLIFFError(FLIFF.ErrorMessages.FailedToSetView));
+                    await expect(fliff.add(options)).rejects.toThrow(new FLIFFError(FLIFF.ErrorMessages.FailedToSetView));
                 });
 
             });
@@ -187,7 +187,7 @@ describe('fliff add', () => {
                 });
 
                 it('reject with error', async () => {
-                    await expect(fliff.add(options)).rejects.toThrowError(fakeErrorResponse.response.data.message);
+                    await expect(fliff.add(options)).rejects.toThrow(fakeErrorResponse.response.data.message);
                 });
             });
 
@@ -202,7 +202,7 @@ describe('fliff add', () => {
                 });
 
                 it('reject with error', async () => {
-                    await expect(fliff.add(options)).rejects.toThrowError(FLIFF.ErrorMessages.FailedToAddLIFF);
+                    await expect(fliff.add(options)).rejects.toThrow(FLIFF.ErrorMessages.FailedToAddLIFF);
                 });
 
             });
