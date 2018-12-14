@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "bin": {
     "fliff": "bin/fliff-cli.js",
-    "richmenu": "bin/richmenu-cli.js"
+    "richmenu": "bin/richmenu-cli.js",
+    "things": "bin/things-cli.js"
   },
   "scripts": {
     "clean": "rimraf bin",
