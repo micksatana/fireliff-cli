@@ -59,17 +59,6 @@
     "mkdirp": "^0.5.1",
     "rimraf": "^2.6.2"
   },
-  "jest": {
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "lib/**/*.{js,jsx}",
-      "!**/node_modules/**"
-    ],
-    "coverageDirectory": "coverage",
-    "roots": [
-      "test"
-    ]
-  },
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint && npm test",
