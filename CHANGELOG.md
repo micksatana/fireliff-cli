@@ -1,5 +1,14 @@
 # Changelog
-## [Unreleased]
+
+## [1.5.0] - 2018-12-15
+### Added
+ - CLIs for LINE Things APIs v1
+   - Get product ID and PSDI by device ID
+   - Get device information by device ID and user ID
+   - Get device information by product ID and user ID
+   - Create trial product information
+   - Get trial product information
+   - Delete trial product information
 ### Fixed
  - Fixed unknown option
 
