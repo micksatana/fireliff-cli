@@ -282,7 +282,7 @@ describe('FunctionsConfig', () => {
             });
 
             it('should not get config', () => {
-                expect(FunctionsConfig.get).not.toBeCalled();
+                expect(FunctionsConfig.get).not.toHaveBeenCalled();
             });
 
             it('should get correct result', () => {
@@ -304,7 +304,7 @@ describe('FunctionsConfig', () => {
             });
 
             it('should not get config', () => {
-                expect(FunctionsConfig.get).not.toBeCalled();
+                expect(FunctionsConfig.get).not.toHaveBeenCalled();
             });
 
             it('should get correct result', () => {
@@ -382,7 +382,7 @@ describe('FunctionsConfig', () => {
             });
 
             it('should not get config', () => {
-                expect(FunctionsConfig.get).not.toBeCalled();
+                expect(FunctionsConfig.get).not.toHaveBeenCalled();
             });
 
             it('should get correct result', () => {
@@ -404,7 +404,7 @@ describe('FunctionsConfig', () => {
             });
 
             it('should not get config', () => {
-                expect(FunctionsConfig.get).not.toBeCalled();
+                expect(FunctionsConfig.get).not.toHaveBeenCalled();
             });
 
             it('should get correct result', () => {

@@ -239,6 +239,40 @@ const signUpUrl = `line://app/${views.some_view}`;
 
 When LINE user access this view `line://app/${views.some_view}`, the user will see `web-views/src/some-view.html` hosted on Firebase Hosting.
 
+## LINE Things
+
+### Enable LINE Things
+
+To enable LINE Things, read [LINE Things Starter, Enable LINE Things](https://github.com/line/line-things-starter#enable-line-things) section
+
+### LINE Things CLIs
+
+**NOTE**: `things` CLIs send requests and `console.log` back the response data. It will not save any information.
+
+#### Create trial product information
+
+`things create:trial --liff <liffId> --name <productName>`
+
+#### Get trial product information
+
+`things get:trial`
+
+#### Delete trial product information
+
+`things delete:trial --product <productId>`
+
+#### Get product ID and PSDI by device ID
+
+`things get:product --device <deviceId>`
+
+#### Get device information by device ID and user ID
+
+`things get:device --device <deviceId> --user <userId>`
+
+#### Get device information by product ID and user ID
+
+`things get:device --product <productId> --user <userId>`
+
 ## LICENSE
 
 MIT License
