@@ -9,11 +9,12 @@ require("./colors-set-theme");
 
 var _default = [{
   header: 'Delete trial product information'.help,
-  content: `things delete:trial --id ${'<productId>'.input}`.code
+  content: `things delete:trial --product ${'<productId>'.input}`.code
 }, {
   header: 'Options',
   optionList: [{
-    name: 'id'.code,
+    name: 'product'.code,
+    typeLabel: '-p'.code,
     description: 'Product ID'
   }]
 }];

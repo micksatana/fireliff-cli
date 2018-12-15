@@ -3,6 +3,8 @@
 
 require("console.table");
 
+var _os = require("os");
+
 require("./colors-set-theme");
 
 var _thingsCliUsage = _interopRequireWildcard(require("./things-cli-usage"));
@@ -35,6 +37,10 @@ try {
   });
   const argv = _unknown || [];
   const options = commandLineArgs([{
+    name: 'device',
+    alias: 'd',
+    type: String
+  }, {
     name: 'help',
     alias: 'h',
     type: Boolean
@@ -43,6 +49,11 @@ try {
     type: String
   }, {
     name: 'liff',
+    alias: 'l',
+    type: String
+  }, {
+    name: 'name',
+    alias: 'n',
     type: String
   }, {
     name: 'product',
@@ -50,10 +61,14 @@ try {
     type: String
   }, {
     name: 'user',
+    alias: 'u',
     type: String
   }, {
     name: 'version',
     alias: 'v',
+    type: Boolean
+  }, {
+    name: 'debug',
     type: Boolean
   }], {
     argv
@@ -61,61 +76,100 @@ try {
   const things = new _things.Things();
 
   if (options.help) {
-    switch (operation) {
-      case 'get':
-        console.log(commandLineUsage(_thingsCliUsage.getUsage));
-        break;
-
-      case 'create':
-        console.log(commandLineUsage(_thingsCliUsage.createUsage));
-        break;
-
-      case 'delete':
-        console.log(commandLineUsage(_thingsCliUsage.deleteUsage));
-        break;
-
-      default:
-        console.log(commandLineUsage(_thingsCliUsage.default));
+    if (/^get/.test(operation)) {
+      console.log(commandLineUsage(_thingsCliUsage.getUsage));
+    } else if (/^create/.test(operation) || /^add/.test(operation)) {
+      console.log(commandLineUsage(_thingsCliUsage.createUsage));
+    } else if (/^delete/.test(operation) || /^remove/.test(operation) || /^rm/.test(operation)) {
+      console.log(commandLineUsage(_thingsCliUsage.deleteUsage));
+    } else {
+      console.log(commandLineUsage(_thingsCliUsage.default));
     }
 
     process.exit(0);
   }
 
-  if (['create:trial', 'delete:trial', 'get:device', 'get:product'].indexOf(operation) > -1) {
+  if (['create:trial', 'delete:trial', 'get:device', 'get:product', 'get:trial'].indexOf(operation) > -1) {
+    switch (operation) {
+      case 'create:trial':
+        if (!options.liff || !options.product) {
+          console.error(`Command ${'things create:trial'.prompt} required LIFF ID and product name`.warn + _os.EOL + `Try re-run with option ${'--liff <liffId>'.input} and ${'--product <productName>'.input}`.help);
+          process.exit(1);
+        }
+
+        break;
+
+      case 'delete:trial':
+        if (!options.product) {
+          console.error(`Command ${'things delete:trial'.prompt} required Product ID`.warn + _os.EOL + `Try re-run with option ${'--product <productId>'.input}`.help);
+          process.exit(1);
+        }
+
+        break;
+
+      case 'get:device':
+        if (!options.user && !options.product || !options.user && !options.device) {
+          console.error(`Command ${'things get:device'.prompt} required User ID together with either product ID or device ID`.warn + _os.EOL + `Try re-run with option ${'--user <userId>'.input}, and  ${'--product <productId>'.input} OR  ${'--device <deviceId>'.input}`.help);
+          process.exit(1);
+        }
+
+        break;
+
+      case 'get:product':
+        if (!options.device) {
+          console.error(`Command ${'things get:product'.prompt} required Device ID option`.warn + _os.EOL + `Try re-run with option ${'--device <deviceId>'.input}`.help);
+          process.exit(1);
+        }
+
+        break;
+    }
+
     (0, _shared.getConfig)().then(_shared.validateConfig).then(() => {
       switch (operation) {
         case 'create:trial':
-          if (!options.liff || !options.product) {
-            console.error(`Command ${'things create:trial'.prompt} required LIFF ID and product name`.warn + EOL + `Try re-run with option ${'--liff <liffId>'.input} and ${'--product <productName>'.input}`.help);
-            process.exit(1);
-          }
-
-          return things.createTrial(options.liff, options.product).then(result => {
+          return things.createTrialProduct(options.liff, options.product).then(result => {
             console.log(result);
             return;
           });
 
         case 'delete:trial':
-          break;
+          return things.deleteTrialProduct(options.product).then(result => {
+            console.log(result);
+            return;
+          });
 
         case 'get:device':
-          if (!options.id) {
-            console.error(`Command ${'things get:device'.prompt} required Device ID option`.warn + EOL + `Try re-run with option ${'--id <deviceId>'.input}`.help);
-            process.exit(1);
+          if (options.product) {
+            return things.getDevicesByProductUser(options.product, options.user).then(result => {
+              console.log(result);
+              return;
+            });
+          } else {
+            return things.getDeviceByDeviceUser(options.device, options.user).then(result => {
+              console.log(result);
+              return;
+            });
           }
-
-          if (!options.user) {
-            things.getProduct(options.id);
-          }
-
-          break;
 
         case 'get:product':
-          break;
+          return things.getProduct(options.device).then(result => {
+            console.log(result);
+            return;
+          });
+
+        case 'get:trial':
+          return things.getTrialProducts().then(result => {
+            console.log(result);
+            return;
+          });
       }
 
       return;
     }).catch(error => {
+      if (options.debug) {
+        console.log('Response', error.response);
+      }
+
       console.error(error.message || error.toString());
       process.exit(1);
     });

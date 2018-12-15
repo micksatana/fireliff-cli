@@ -6,9 +6,10 @@ Object.defineProperty(exports, "__esModule", {
 exports.ThingsError = void 0;
 
 class ThingsError extends Error {
-  constructor(message) {
+  constructor(message, response) {
     super(message);
     this.name = 'ThingsError';
+    this.response = response;
   }
 
 }

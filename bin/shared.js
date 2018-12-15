@@ -27,6 +27,8 @@ function validateConfig(config) {
     console.log(`${'firebase functions:config:set line.access_token='.code}${'<channelAccessToken>'.prompt}`);
     process.exit(1);
   }
+
+  return;
 }
 
 function commandErrorHandler(error) {

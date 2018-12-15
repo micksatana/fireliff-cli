@@ -25,7 +25,7 @@ describe('things create:trial', () => {
         expect(Things.ErrorMessages.FailedToCreateTrial403).toBeDefined();
     });
 
-    describe('createTrial', () => {
+    describe('createTrialProduct', () => {
         let liffId = 'testLIFFID';
         let productName = 'testProductName';
         let res = {
@@ -43,7 +43,7 @@ describe('things create:trial', () => {
                 jest.spyOn(req, 'send').mockResolvedValue(res);
                 ThingsCreateTrialRequest.mockImplementation(() => { return req; });
                 things = new Things();
-                result = await things.createTrial(liffId, productName);
+                result = await things.createTrialProduct(liffId, productName);
             });
 
             it('create request with access token', () => {
@@ -78,7 +78,7 @@ describe('things create:trial', () => {
                 jest.spyOn(req, 'send').mockRejectedValue(error);
                 ThingsCreateTrialRequest.mockImplementation(() => { return req; });
                 things = new Things();
-                await things.createTrial(liffId, productName).catch(catchedError => result = catchedError);
+                await things.createTrialProduct(liffId, productName).catch(catchedError => result = catchedError);
             });
 
             it('reject with error', () => {
@@ -103,7 +103,7 @@ describe('things create:trial', () => {
                 jest.spyOn(req, 'send').mockRejectedValue(error);
                 ThingsCreateTrialRequest.mockImplementation(() => { return req; });
                 things = new Things();
-                await things.createTrial(liffId, productName).catch(catchedError => result = catchedError);
+                await things.createTrialProduct(liffId, productName).catch(catchedError => result = catchedError);
             });
 
             it('reject with error', () => {
@@ -128,7 +128,7 @@ describe('things create:trial', () => {
                 jest.spyOn(req, 'send').mockRejectedValue(error);
                 ThingsCreateTrialRequest.mockImplementation(() => { return req; });
                 things = new Things();
-                await things.createTrial(liffId, productName).catch(catchedError => result = catchedError);
+                await things.createTrialProduct(liffId, productName).catch(catchedError => result = catchedError);
             });
 
             it('reject with error', () => {
@@ -153,7 +153,7 @@ describe('things create:trial', () => {
                 jest.spyOn(req, 'send').mockRejectedValue(error);
                 ThingsCreateTrialRequest.mockImplementation(() => { return req; });
                 things = new Things();
-                await things.createTrial(liffId, productName).catch(catchedError => result = catchedError);
+                await things.createTrialProduct(liffId, productName).catch(catchedError => result = catchedError);
             });
 
             it('reject with error', async () => {
@@ -178,7 +178,7 @@ describe('things create:trial', () => {
                 jest.spyOn(req, 'send').mockRejectedValue(error);
                 ThingsCreateTrialRequest.mockImplementation(() => { return req; });
                 things = new Things();
-                await things.createTrial(liffId, productName).catch(catchedError => result = catchedError);
+                await things.createTrialProduct(liffId, productName).catch(catchedError => result = catchedError);
             });
 
             it('reject with error', async () => {
