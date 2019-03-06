@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.1] - 2019-03-06
+### Changed
+ - Update dependencies
+
 ## [1.5.0] - 2018-12-15
 ### Added
  - CLIs for LINE Things APIs v1
