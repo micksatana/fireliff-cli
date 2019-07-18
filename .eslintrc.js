@@ -20,6 +20,7 @@ module.exports = {
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "require-atomic-updates": 0
     }
 };
