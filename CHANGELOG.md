@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.2] - 2019-07-18
+### Changed
+ - Update dependencies
+
 ## [1.5.1] - 2019-03-06
 ### Changed
  - Update dependencies
