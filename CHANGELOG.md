@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.5.3] - 2019-09-14
+### Changed
+ - Update dependencies
+### Fixed
+ - Security vulnerability
+
 ## [1.5.2] - 2019-07-18
 ### Changed
  - Update dependencies

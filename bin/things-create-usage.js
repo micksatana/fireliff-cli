@@ -9,7 +9,7 @@ require("./colors-set-theme");
 
 var _default = [{
   header: 'Create trial product information'.help,
-  content: `things create:trial --liff ${'<liffId>'.input} --name ${'<productName>'.input}`.code
+  content: `things create:trial --liff ${'<liffId>'.input} --product ${'<productName>'.input}`.code
 }, {
   header: 'Options',
   optionList: [{

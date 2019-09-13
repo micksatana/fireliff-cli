@@ -75,8 +75,8 @@ describe('RichMenuUploadRequest', () => {
                     jest.spyOn(req.axios, 'post').mockResolvedValue('any');
                 });
 
-                it('should reject with the error', () => {
-                    expect(req.send(richMenuId, imagePath)).rejects.toEqual(expectedError);
+                it('should reject with the error', async () => {
+                    await expect(req.send(richMenuId, imagePath)).rejects.toEqual(expectedError);
                 });
 
                 afterAll(() => {

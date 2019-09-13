@@ -116,8 +116,8 @@ describe('FunctionsConfig', () => {
                 jest.spyOn(FunctionsConfig, 'parseGetConfigError').mockImplementation(x => x);
             });
 
-            it('should reject with the error', () => {
-                expect(FunctionsConfig.get()).rejects.toEqual(fakeError);
+            it('should reject with the error', async () => {
+                await expect(FunctionsConfig.get()).rejects.toEqual(fakeError);
             });
 
             afterAll(() => {
@@ -137,8 +137,8 @@ describe('FunctionsConfig', () => {
                 });
             });
 
-            it('should reject with the error', () => {
-                expect(FunctionsConfig.get()).rejects.toEqual(fakeError);
+            it('should reject with the error', async () => {
+                await expect(FunctionsConfig.get()).rejects.toEqual(fakeError);
             });
 
             afterAll(() => {
@@ -184,8 +184,8 @@ describe('FunctionsConfig', () => {
                 ChildProcess.exec.mockImplementation((command, callback) => callback(fakeError));
             });
 
-            it('should reject with the error', () => {
-                expect(FunctionsConfig.set(name, value)).rejects.toEqual(fakeError);
+            it('should reject with the error', async () => {
+                await expect(FunctionsConfig.set(name, value)).rejects.toEqual(fakeError);
             });
 
             afterAll(() => {
@@ -229,8 +229,8 @@ describe('FunctionsConfig', () => {
                 ChildProcess.exec.mockImplementation((command, callback) => callback(fakeError));
             });
 
-            it('should reject with the error', () => {
-                expect(FunctionsConfig.unset(name)).rejects.toEqual(fakeError);
+            it('should reject with the error', async () => {
+                await expect(FunctionsConfig.unset(name)).rejects.toEqual(fakeError);
             });
 
             afterAll(() => {

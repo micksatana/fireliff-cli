@@ -1,6 +1,6 @@
 {
   "name": "@intocode-io/fireliff-cli",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Command line interface for building LIFF app on Firebase",
   "main": "lib/index.js",
   "bin": {
@@ -41,23 +41,23 @@
     "command-line-usage": "^6.0.2",
     "console.table": "^0.10.0",
     "prompt": "^1.0.0",
-    "qs": "^6.7.0",
+    "qs": "^6.8.0",
     "recursive-copy": "^2.0.10"
   },
   "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
+    "@babel/cli": "^7.6.0",
+    "@babel/core": "^7.6.0",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
+    "@babel/preset-env": "^7.6.0",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-eslint": "^10.0.2",
-    "babel-jest": "^24.8.0",
-    "eslint": "^6.0.1",
-    "eslint-plugin-jest": "^22.10.0",
-    "husky": "^3.0.0",
-    "jest": "^24.8.0",
+    "babel-eslint": "^10.0.3",
+    "babel-jest": "^24.9.0",
+    "eslint": "^6.3.0",
+    "eslint-plugin-jest": "^22.17.0",
+    "husky": "^3.0.5",
+    "jest": "^24.9.0",
     "mkdirp": "^0.5.1",
-    "rimraf": "^2.6.3"
+    "rimraf": "^3.0.0"
   },
   "husky": {
     "hooks": {

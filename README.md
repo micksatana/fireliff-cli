@@ -5,6 +5,8 @@
 
 Command line interface for building LIFF app on Firebase. This module will help you handle API to add, update, delete, get LIFF apps and set LIFF IDs in Firebase Functions configuration which can be retrieved in your Functions project.
 
+NOTE: If you do not need to work with Firebase, we recommend our latest package [`@intocode-io/line-api-cli`](https://www.npmjs.com/package/@intocode-io/line-api-cli)
+
 ## Prerequisite
 
 ### Firebase Tools
