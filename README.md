@@ -2,6 +2,8 @@
 [![Build Status](https://travis-ci.org/intocode-io/fireliff-cli.svg?branch=master)](https://travis-ci.org/intocode-io/fireliff-cli)
 [![codecov](https://codecov.io/gh/intocode-io/fireliff-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/intocode-io/fireliff-cli)
 [![dependencies Status](https://david-dm.org/intocode-io/fireliff-cli/status.svg)](https://david-dm.org/intocode-io/fireliff-cli)
+![NPM](https://img.shields.io/npm/l/@intocode-io/line-api-cli)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/micksatana?locale.x=en_GB)
 
 Command line interface for building LIFF app on Firebase. This module will help you handle API to add, update, delete, get LIFF apps and set LIFF IDs in Firebase Functions configuration which can be retrieved in your Functions project.
 
