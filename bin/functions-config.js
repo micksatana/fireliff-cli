@@ -15,7 +15,7 @@ var _functionsConfigError = require("./functions-config-error");
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; if (obj != null) { var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 const FailedToGetConfig = 'Failed to get configuration'.error;
 const FailedToGetConfigAuthError = [FailedToGetConfig, 'Suggestions:'.info, 'Your credentials are no longer valid. Please run firebase login --reauth'.verbose].join(_os.EOL);
@@ -95,10 +95,10 @@ class FunctionsConfig {
   }
   /**
    * Find value (id) of a property in a group
-   * 
-   * @param {string} group 
-   * @param {string} name 
-   * @param {*} config 
+   *
+   * @param {string} group
+   * @param {string} name
+   * @param {*} config
    */
 
 
@@ -119,10 +119,10 @@ class FunctionsConfig {
   }
   /**
    * Find properties in a group which their value matched id
-   * 
-   * @param {string} group 
-   * @param {string} id 
-   * @param {*} config 
+   *
+   * @param {string} group
+   * @param {string} id
+   * @param {*} config
    */
 
 
@@ -144,8 +144,8 @@ class FunctionsConfig {
     return names;
   }
   /**
-   * 
-   * @param {Error|string} error 
+   *
+   * @param {Error|string} error
    * @return {string} error message intented to be used in console.log
    */
 
@@ -160,9 +160,9 @@ class FunctionsConfig {
     }
   }
   /**
-   * 
+   *
    * @param {string} name
-   * @return {string} name in Firebase Functions Config acceptable format 
+   * @return {string} name in Firebase Functions Config acceptable format
    */
 
 
@@ -171,8 +171,8 @@ class FunctionsConfig {
   }
   /**
    * Load configuration and set into config
-   * 
-   * @return {Promise} config 
+   *
+   * @return {Promise} config
    */
 
 

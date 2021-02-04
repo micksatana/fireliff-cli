@@ -14,7 +14,7 @@ class ThingsRequest {
     this.endpoint = 'https://api.line.me/things/v1';
     this.axios = _axios.default.create({
       headers: {
-        'authorization': `Bearer ${options.accessToken}`,
+        authorization: `Bearer ${options.accessToken}`,
         'content-type': 'application/json'
       }
     });

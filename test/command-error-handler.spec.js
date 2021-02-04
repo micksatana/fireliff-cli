@@ -2,56 +2,54 @@ import '../lib/colors-set-theme';
 import { commandErrorHandler } from '../lib/shared';
 
 describe('commandErrorHandler', () => {
+  beforeAll(() => {
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(process, 'exit').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    console.log.mockRestore();
+    process.exit.mockRestore();
+  });
+
+  describe('when UNKNOWN_OPTION', () => {
+    let error;
 
     beforeAll(() => {
-        jest.spyOn(console, 'log').mockImplementation(() => { });
-        jest.spyOn(process, 'exit').mockImplementation(() => { });
+      error = new Error('Blah blah error');
+      error.name = 'UNKNOWN_OPTION';
+      error.optionName = 'blah';
+
+      commandErrorHandler(error);
     });
 
-    afterAll(() => {
-        console.log.mockRestore();
-        process.exit.mockRestore();
+    it('log error', () => {
+      expect(console.log).toHaveBeenCalledWith(
+        `Unknown option ${error.optionName.input}`.error
+      );
     });
 
-    describe('when UNKNOWN_OPTION', () => {
-        let error;
+    it('exit with code 1', () => {
+      expect(process.exit).toHaveBeenCalledWith(1);
+    });
+  });
 
-        beforeAll(() => {
-            error = new Error('Blah blah error');
-            error.name = 'UNKNOWN_OPTION';
-            error.optionName = 'blah';
-            
-            commandErrorHandler(error);
-        });
+  describe('when unknown error', () => {
+    let error;
 
-        it('log error', () => {
-            expect(console.log).toHaveBeenCalledWith(`Unknown option ${error.optionName.input}`.error);
-        });
+    beforeAll(() => {
+      error = new Error('something else');
+      error.name = 'somethingelse';
 
-        it('exit with code 1', () => {
-            expect(process.exit).toHaveBeenCalledWith(1);
-        });
-
+      commandErrorHandler(error);
     });
 
-    describe('when unknown error', () => {
-        let error;
-
-        beforeAll(() => {
-            error = new Error('something else');
-            error.name = 'somethingelse';
-            
-            commandErrorHandler(error);
-        });
-
-        it('log error', () => {
-            expect(console.log).toHaveBeenCalledWith(error.toString().error);
-        });
-
-        it('exit with code 1', () => {
-            expect(process.exit).toHaveBeenCalledWith(1);
-        });
-
+    it('log error', () => {
+      expect(console.log).toHaveBeenCalledWith(error.toString().error);
     });
 
+    it('exit with code 1', () => {
+      expect(process.exit).toHaveBeenCalledWith(1);
+    });
+  });
 });

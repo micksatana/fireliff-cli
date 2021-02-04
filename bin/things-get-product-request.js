@@ -13,8 +13,8 @@ class ThingsGetProductRequest extends _thingsRequest.ThingsRequest {
     this.endpoint = `${this.endpoint}/devices`;
   }
   /**
-   * 
-   * @param {string} deviceId 
+   *
+   * @param {string} deviceId
    */
 
 

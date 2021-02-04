@@ -13,7 +13,7 @@ class ThingsDeleteTrialProductRequest extends _thingsRequest.ThingsRequest {
     this.endpoint = `${this.endpoint}/trial/products`;
   }
   /**
-   * 
+   *
    * @param {string} productId Product ID
    */
 

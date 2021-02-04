@@ -14,7 +14,7 @@ class LIFFRequest {
     this.endpoint = 'https://api.line.me/liff/v1/apps';
     this.axios = _axios.default.create({
       headers: {
-        'authorization': `Bearer ${options.accessToken}`,
+        authorization: `Bearer ${options.accessToken}`,
         'content-type': 'application/json'
       }
     });

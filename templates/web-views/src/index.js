@@ -13,7 +13,7 @@ import './index.css';
 
 /**
  * To initialize LIFF
- * 
+ *
  * Note: liff is defined when LIFF SDK script is included in .html file
  */
 // liff.init(

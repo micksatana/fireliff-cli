@@ -5,95 +5,98 @@ import { RichMenuUploadRequest } from '../lib/rich-menu-upload-request';
 jest.mock('fs');
 
 describe('RichMenuUploadRequest', () => {
+  describe('when create an instance with options.accessToken', () => {
+    let req;
+    let accessToken = 'someaccesstoken';
 
-    describe('when create an instance with options.accessToken', () => {
-        let req;
-        let accessToken = 'someaccesstoken';
+    beforeAll(() => {
+      jest.spyOn(Axios, 'create');
+      req = new RichMenuUploadRequest({ accessToken });
+    });
 
+    it('should have correct endpoint', () => {
+      expect(req.endpoint).toEqual('https://api.line.me/v2/bot/richmenu');
+    });
+
+    it('should create axios instance with correct headers for LINE API', () => {
+      expect(Axios.create).toHaveBeenCalledWith({
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          'content-type': 'image/jpeg',
+        },
+      });
+      expect(req.axios).toBeDefined();
+    });
+
+    describe('when send data', () => {
+      let richMenuId = 'sdlfhaos';
+      let imagePath = 'blah/blah.pdf';
+      let fakeStat = { size: 8888 };
+      let fakeStream = {};
+
+      describe('and no error in file stat', () => {
         beforeAll(() => {
-            jest.spyOn(Axios, 'create');
-            req = new RichMenuUploadRequest({ accessToken });
+          fs.createReadStream.mockImplementation(() => fakeStream);
+          fs.stat.mockImplementation((path, callback) =>
+            callback(null, fakeStat)
+          );
+          jest.spyOn(req.axios, 'post').mockResolvedValue('any');
+          req.send(richMenuId, imagePath);
         });
 
-        it('should have correct endpoint', () => {
-            expect(req.endpoint).toEqual('https://api.line.me/v2/bot/richmenu');
+        it('should have correct content-length in headers', () => {
+          expect(req.axios.defaults.headers.common['content-length']).toEqual(
+            fakeStat.size
+          );
         });
 
-        it('should create axios instance with correct headers for LINE API', () => {
-            expect(Axios.create).toHaveBeenCalledWith({
-                headers: {
-                    'authorization': `Bearer ${accessToken}`,
-                    'content-type': 'image/jpeg'
-                }
-            });
-            expect(req.axios).toBeDefined();
+        it('should get file stat', () => {
+          expect(fs.stat).toHaveBeenCalledWith(imagePath, expect.anything());
         });
 
-        describe('when send data', () => {
-            let richMenuId = 'sdlfhaos';
-            let imagePath = 'blah/blah.pdf';
-            let fakeStat = { size: 8888 };
-            let fakeStream = {};
-
-            describe('and no error in file stat', () => {
-
-                beforeAll(() => {
-                    fs.createReadStream.mockImplementation(() => fakeStream);
-                    fs.stat.mockImplementation((path, callback) => callback(null, fakeStat));
-                    jest.spyOn(req.axios, 'post').mockResolvedValue('any');
-                    req.send(richMenuId, imagePath);
-                });
-
-                it('should have correct content-length in headers', () => {
-                    expect(req.axios.defaults.headers.common['content-length']).toEqual(fakeStat.size);
-                });
-
-                it('should get file stat', () => {
-                    expect(fs.stat).toHaveBeenCalledWith(imagePath, expect.anything());
-                });
-
-                it('should send read stream', () => {
-                    expect(fs.createReadStream).toHaveBeenCalledWith(imagePath);
-                    expect(req.axios.post).toHaveBeenCalledTimes(1);
-                    expect(req.axios.post).toHaveBeenCalledWith(`${req.endpoint}/${richMenuId}/content`, fakeStream);
-                });
-
-                afterAll(() => {
-                    fs.createReadStream.mockRestore();
-                    fs.stat.mockRestore();
-                    req.axios.post.mockRestore();
-                });
-
-            });
-
-            describe('and has error in file stat', () => {
-                let expectedError = new Error('some error in file stat');
-
-                beforeAll(() => {
-                    fs.createReadStream.mockImplementation(() => fakeStream);
-                    fs.stat.mockImplementation((path, callback) => callback(expectedError, null));
-                    jest.spyOn(req.axios, 'post').mockResolvedValue('any');
-                });
-
-                it('should reject with the error', async () => {
-                    await expect(req.send(richMenuId, imagePath)).rejects.toEqual(expectedError);
-                });
-
-                afterAll(() => {
-                    fs.createReadStream.mockRestore();
-                    fs.stat.mockRestore();
-                    req.axios.post.mockRestore();
-                });
-
-            });
-
-
+        it('should send read stream', () => {
+          expect(fs.createReadStream).toHaveBeenCalledWith(imagePath);
+          expect(req.axios.post).toHaveBeenCalledTimes(1);
+          expect(req.axios.post).toHaveBeenCalledWith(
+            `${req.endpoint}/${richMenuId}/content`,
+            fakeStream
+          );
         });
 
         afterAll(() => {
-            Axios.create.mockRestore();
+          fs.createReadStream.mockRestore();
+          fs.stat.mockRestore();
+          req.axios.post.mockRestore();
+        });
+      });
+
+      describe('and has error in file stat', () => {
+        let expectedError = new Error('some error in file stat');
+
+        beforeAll(() => {
+          fs.createReadStream.mockImplementation(() => fakeStream);
+          fs.stat.mockImplementation((path, callback) =>
+            callback(expectedError, null)
+          );
+          jest.spyOn(req.axios, 'post').mockResolvedValue('any');
         });
 
+        it('should reject with the error', async () => {
+          await expect(req.send(richMenuId, imagePath)).rejects.toEqual(
+            expectedError
+          );
+        });
+
+        afterAll(() => {
+          fs.createReadStream.mockRestore();
+          fs.stat.mockRestore();
+          req.axios.post.mockRestore();
+        });
+      });
     });
 
+    afterAll(() => {
+      Axios.create.mockRestore();
+    });
+  });
 });

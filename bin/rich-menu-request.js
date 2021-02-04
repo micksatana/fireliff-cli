@@ -14,7 +14,7 @@ class RichMenuRequest {
     this.endpoint = 'https://api.line.me/v2/bot/richmenu';
     this.axios = _axios.default.create({
       headers: {
-        'authorization': `Bearer ${options.accessToken}`,
+        authorization: `Bearer ${options.accessToken}`,
         'content-type': options.contentType || 'application/json'
       }
     });

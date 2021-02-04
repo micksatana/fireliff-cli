@@ -13,7 +13,7 @@ class ThingsCreateTrialRequest extends _thingsRequest.ThingsRequest {
     this.endpoint = `${this.endpoint}/trial/products`;
   }
   /**
-   * 
+   *
    * @param {string} liffId LIFF ID
    * @param {string} name Product name
    */

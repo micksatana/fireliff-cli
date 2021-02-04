@@ -97,7 +97,7 @@ class Things {
 
   constructor() {}
   /**
-   * 
+   *
    * @param {string} liff LIFF ID
    * @param {string} name Product name
    */
@@ -128,7 +128,7 @@ class Things {
     return res.data;
   }
   /**
-   * 
+   *
    * @param {string} productId Product ID
    */
 
@@ -154,7 +154,7 @@ class Things {
     return res.data;
   }
   /**
-   * 
+   *
    * @param {string} deviceId Device ID
    * @param {string} userId User ID
    */
@@ -181,7 +181,7 @@ class Things {
     return res.data;
   }
   /**
-   * 
+   *
    * @param {string} productId Product ID
    * @param {string} userId User ID
    */
@@ -208,7 +208,7 @@ class Things {
     return res.data;
   }
   /**
-   * 
+   *
    * @param {string} deviceId Device ID
    */
 

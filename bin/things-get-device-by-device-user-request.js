@@ -12,7 +12,7 @@ class ThingsGetDeviceByDeviceUserRequest extends _thingsRequest.ThingsRequest {
     super(options);
   }
   /**
-   * 
+   *
    * @param {string} deviceId Device ID
    * @param {string} userId User ID
    */

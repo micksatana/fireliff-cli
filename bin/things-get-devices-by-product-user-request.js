@@ -12,7 +12,7 @@ class ThingsGetDevicesByProductUserRequest extends _thingsRequest.ThingsRequest 
     super(options);
   }
   /**
-   * 
+   *
    * @param {string} productId Product ID
    * @param {string} userId User ID
    */
