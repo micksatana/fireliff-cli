@@ -1,7 +1,7 @@
 # fireliff-cli
 [![Build Status](https://travis-ci.com/micksatana/fireliff-cli.svg?branch=master)](https://travis-ci.com/micksatana/fireliff-cli)
-[![codecov](https://codecov.io/gh/intocode-io/fireliff-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/intocode-io/fireliff-cli)
-[![dependencies Status](https://david-dm.org/intocode-io/fireliff-cli/status.svg)](https://david-dm.org/intocode-io/fireliff-cli)
+[![codecov](https://codecov.io/gh/micksatana/fireliff-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/micksatana/fireliff-cli)
+[![dependencies Status](https://david-dm.org/micksatana/fireliff-cli/status.svg)](https://david-dm.org/micksatana/fireliff-cli)
 ![NPM](https://img.shields.io/npm/l/@intocode-io/line-api-cli)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/micksatana?locale.x=en_GB)
 
